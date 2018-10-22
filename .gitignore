@@ -1,0 +1,11 @@
+latex/*.aux
+latex/*.bcf
+latex/*.log
+latex/*.nav
+latex/*.out
+latex/*.pdf
+latex/*.run.xml
+latex/*.snm
+latex/*.synctex.gz
+latex/*.toc
+
