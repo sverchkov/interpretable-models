@@ -91,6 +91,54 @@ Why are we explaining things?
 
 %%% FRAMEBREAK %%%
 
+\begin{frame}{Anchor: formal definition}
+  Given a black-box model $f : X \rightarrow Y$
+  
+  $X$ is the space of instances, $Y$ is the space of model outputs.
+  
+  $A : X \rightarrow \{0,1\}$ is an anchor iff
+  
+  $\underbrace{\mathbb{E}_{\mathcal D (z | A)} \left[ \mathbf{1}_{f(x)=f(z)} \right] }_{\mathrm{Prec}(A)} \geq \tau$ when $A(x) = 1$
+  
+  That is, $A$ is a rule that holds for our sample $x$ and, for any $z$ in the data distribution for which $A$ holds, the output is (probably) the same as for $x$.
+\end{frame}
+
+% TODO:
+% Motivation:
+%  (many good ml systems are black box)
+%  "chat vignette": what dis? cat! why? math! *confused* ; better explanation
+%
+%  (there is a need from)
+%  policymakers/legal: GDPR (find the ref)
+%  high-risk decision-makers: (doctors/critical systems/self-driving)
+%  explanations build trust (find a ref?)
+%
+% What makes an explanation/interpretable model?
+%  Rules (decision trees as a subset)
+%  Linear models
+%  Sidebar about the difference between a "classical statistician" and a "machine learning expert" when using logistic regression
+%
+% Go over main paper in detail:
+%  What's an "Anchor" -- examples and tasks
+%    text classification
+%    structured prediction
+%    tabular classification
+%    image classification
+%    visual question answering
+%  What's an Anchor mathematically (formula) -DONE (sort of)
+%
+%  How to find anchors: greedy build up
+%   candidates are built up by adding feature predicates to candidate anchors
+%   candidate precision is sampled from a distrinution
+%   uses KL-LUCB (look up? briefly describe? Kaufmann and Kalyanakrishnan 2013)
+%   select rules for best mean (A) and highest upperbound (A')
+%
+%  Comparison to LIME (briefly summarize LIME)
+%
+%  Experiments with users
+
+%%% FRAMEBREAK %%%
+
 \begin{frame}{a frame}
 with text
 \end{frame}
