@@ -22,6 +22,7 @@
 
 %% COLORS
 \definecolor{UWRed}{HTML}{C5050C}
+\definecolor{TintedBG}{HTML}{EEEEFF}
 %\definecolor{StrongBlue}{HTML}{3F8FD2}
 %\definecolor{StrongGreen}{HTML}{36C88E}
 %\definecolor{StrongRed}{HTML}{9B0000}
@@ -74,20 +75,137 @@
     \end{frame}
   }
 
-\begin{frame}{First, some context}
-Why are we explaining things?
+%%% FRAMEBREAK %%%
+
+% Motivation:
+%  (many good ml systems are black box)
+%  "chat vignette": what dis? cat! why? math! *confused* ; better explanation
+%
+%  (there is a need from)
+%  policymakers/legal: GDPR (find the ref)
+%  high-risk decision-makers: (doctors/critical systems/self-driving)
+%  explanations build trust (find a ref?)
+
+\begin{frame}{\textbf{Why} should we \textbf{explain} our models?}
+
+\begin{itemize}[<+->]
+	\item Many of the best-performing machine learning models are not (easily) \textbf{interpretable} (by non-ML experts)
+	\item Users need explanations:
+	\begin{itemize}
+		\item when using models for medical decisions
+		\item when using models for policymaking
+		\item in other high-risk decision support
+		\item for legal reasons
+	\end{itemize}
+\end{itemize}
+\pause
+
+\textbf{GDPR Article 13(2f)} [The data subject shall be informed of] the existence of automated decision-making [... and provided] meaningful information about the logic involved
+
+\begin{itemize}[<+->]
+	\item Explanations build trust in a good model
+	\item Explanations can help troubleshoot a bad model
+\end{itemize}
+\end{frame}
+
+%%% FRAMEBREAK %%%
+
+\begin{frame}
+\vfill
+
+\centering
+\includegraphics[width=6cm]{LIME-wolf.png}
+
+\vfill
+
+\raggedleft
+\scriptsize
+Ribiero, Singh, and Guestrin, SIGKDD 2016
+\end{frame}
+
+%%% FRAMEBREAK %%%
+
+\begin{frame}{Interpretable models}
+\begin{columns}
+	\column[T]{0.45\textwidth}
+	\begin{center}\bf Interpretable \end{center}
+	\begin{itemize}
+		\item Generalized linear models
+		\item[] $y = g^{-1}( X\beta )$
+		\item[] %TODO! make illustration explaining how to interpret linear model
+		\item Rules and decision trees
+		%\item [] example?
+	\end{itemize}
+	
+	\column[T]{0.45\textwidth}
+	\begin{center}\textbf{Uninterpretable} or "black box"\end{center}
+	% image refs, for ai box: fico.com
+	% for steampunk box: https://www.lindacohendesigns.com
+	
+	$y = \sigma( W^1 \sigma( W^2 \sigma( W^3 X ) ) )$
+	
+\end{columns}
 \end{frame}
   
 %%% FRAMEBREAK %%%
 
-\begin{frame}{Prior work}
-\begin{itemize}
-	\item TERPAN
-	\item LIME
-	\item that thingie for images
+\begin{frame}{Explanation}
+\begin{itemize}[<+->]
+	\item Uninterpretable $\rightarrow$ Interpretable
+	\item TREPAN (Craven and Shavlik, NIPS 1996)
+	\item[] Decision tree
+	\item LIME (Ribiero, Singh, and Guestrin, SIGKDD 2016)
+	\item[] (locally) Linear model
+	\item Anchors () % TODO
+	\item[] Conjunctive rules
 \end{itemize}
-\includegraphics[width=6cm]{trepan-title.png}
+
 \end{frame}
+
+%%% FRAMEBREAK %%%
+
+\begin{frame}{TREPAN} % TODO
+\begin{columns}
+	\column{0.5\textwidth}
+	\begin{itemize}[<+->]
+		\item Learns a decision tree from a neural network (NN)
+		\item A big challenge to learning decision trees from data is that the amount of relevant samples decreases as the tree gets deeper
+		\item TREPAN uses the NN for an oracle to evaluate splits, eliminating this issue
+		\item Decision nodes ($n$) to expand are prioritized by
+		\item[] $\mathit{reach}( n ) \times (1 - \mathit{fidelity}(n) )$
+	\end{itemize}
+	\column{6cm}
+	\includegraphics[width=6cm]{trepan-title.png}
+\end{columns}
+\end{frame}
+
+%%% FRAMEBREAK %%%
+
+\begin{frame}{LIME}
+\begin{columns}
+	\column{0.47\textwidth} \centering
+	\includegraphics[width=6cm]{LIME-title.png}
+	
+	{\color{UWRed}
+	\[
+	\arg \min_g \underbrace{ \mathcal L ( f, g, \pi_x ) }_{\text{fidelity loss around }x} + \underbrace{ \Omega( g ) }_\text{complexity}
+	\]}
+	
+	\includegraphics[width=6cm]{LIME-alg.png}
+	\column{0.47\textwidth} \centering
+	\includegraphics[width=6cm]{LIME-intuition.png}
+\end{columns}
+\end{frame}
+
+%%% FRAMEBREAK %%%
+
+\begin{frame}{LIME applied to images}
+\includegraphics[width=\textwidth]{LIME-image.png}
+\end{frame}
+
+%%% FRAMEBREAK %%%
+
+
 
 %%% FRAMEBREAK %%%
 
@@ -104,18 +222,7 @@ Why are we explaining things?
 \end{frame}
 
 % TODO:
-% Motivation:
-%  (many good ml systems are black box)
-%  "chat vignette": what dis? cat! why? math! *confused* ; better explanation
-%
-%  (there is a need from)
-%  policymakers/legal: GDPR (find the ref)
-%  high-risk decision-makers: (doctors/critical systems/self-driving)
-%  explanations build trust (find a ref?)
-%
-% What makes an explanation/interpretable model?
-%  Rules (decision trees as a subset)
-%  Linear models
+
 %  Sidebar about the difference between a "classical statistician" and a "machine learning expert" when using logistic regression
 %
 % Go over main paper in detail:
