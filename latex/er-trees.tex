@@ -1,0 +1,23 @@
+\documentclass{article}
+
+\usepackage{amsmath,amsfonts}
+
+\title{The exception or the rule? A high-fidelity tree-based explanation for uninterpretable models.}
+
+\author{Yuriy Sverchkov}
+
+\begin{document}
+	\begin{abstract}
+		Model interpretability is an important emerging field.
+		Here we present a method for instance-based explanation that uses trees.
+		The novelty of the approach is that we build trees top-down and bottom-up to
+		capture both general rules and instance-specific considerations to account for
+		the model's decision.
+	\end{abstract}
+\section{Introduction}
+Motivation, background.
+\section{Method}
+Our goal is to explain the prediction of a model $f: \mathbb R^n \rightarrow \mathbb R$.
+Particularly for an instance $x= (x_1,\ldots, x_n)$.
+Our goal is to find either a minimal number of features such that any $x'$ with matching features yields the same (or a close) prediction ($x$ is the rule), or, a minimal number of features such that any $x'$ with differing values at those features yields a different (or close) prediction ($x$ is the exception).
+\end{document}
