@@ -8,4 +8,4 @@ latex/*.run.xml
 latex/*.snm
 latex/*.synctex.gz
 latex/*.toc
-
+.DS_Store

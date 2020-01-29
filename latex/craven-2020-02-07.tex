@@ -1,0 +1,364 @@
+% !TEX encoding = UTF-8 Unicode
+
+\documentclass[aspectratio=169]{beamer}
+\usepackage[utf8]{inputenc}
+
+%% BIB
+\usepackage[
+  style=authoryear,
+  backend=biber,
+  url=false,
+  maxcitenames=2,
+  uniquename=false,
+  uniquelist=false
+]{biblatex}
+%\addbibresource{?.bib}
+
+%% GRAPHICS
+
+\usepackage{graphicx}
+\graphicspath{{images/},{figures/}}
+\usepackage{tikz}
+
+%% COLORS
+\definecolor{UWRed}{HTML}{C5050C}
+\definecolor{TintedBG}{HTML}{EEEEFF}
+%\definecolor{StrongBlue}{HTML}{3F8FD2}
+%\definecolor{StrongGreen}{HTML}{36C88E}
+%\definecolor{StrongRed}{HTML}{9B0000}
+%\definecolor{MyC}{HTML}{009999}
+%\definecolor{MyM}{HTML}{990099}
+%\definecolor{MyY}{HTML}{999900}
+%\definecolor{MyR}{HTML}{990000}
+%\definecolor{MyG}{HTML}{009900}
+%\definecolor{MyB}{HTML}{000099}
+%\definecolor{ActionRed}{HTML}{990000}
+
+%% SLIDE COLOR SETTINGS
+\setbeamercolor{structure}{fg=UWRed}
+\setbeamercolor{title page}{fg=white}
+\setbeamercolor{title}{fg=white}
+
+%% RM NAV SYMBOLS
+\setbeamertemplate{navigation symbols}{}
+
+%% FONTS
+\setbeamerfont{title}{size=\huge\bfseries}
+
+%% DRAWING
+%\usetikzlibrary{}
+
+%% LOGO on slides
+%\logo{\begin{tikzpicture}[overlay]
+%  \node[anchor=north east,inner sep=0] at (0,86mm) {\includegraphics[height=10mm]{SMPH_color-flush.pdf}};
+%\end{tikzpicture}}
+
+%% CONTENT BEGINS
+
+\title{Craven Group Meeting}
+\author{Yuriy Sverchkov}
+\institute{University of Wisconsin--Madison}
+\date{February 7, 2020}
+
+\begin{document}
+	
+	\begin{frame}[plain]
+		\raggedleft
+		\includegraphics[width=\linewidth]{lakkaraju-2019-title.png} \\
+		\vfill
+		\it Presentation by Yuriy Sverchkov \\
+		\textbf{Craven Group Meeting} \\ February 7, 2020
+	\end{frame}
+
+	% Insert some background and motivation here
+	
+	% Problem statement
+	
+	\begin{frame}
+		`` The most important criterion for choosing a representation is that it
+		should be understandable to decision makers who are not experts in
+		machine learning, readily approximate complex black box models,
+		and allow us to incorporate human input when generating explanations. ''
+		% TODO Fancy quote visuals
+		% TODO point out fidelity, unambiguity, and interpretability
+	\end{frame}
+
+	\begin{frame}{Representation}
+		
+		Two level decision set
+		
+		$\{ (q_i, s_i, c_i) | i \in 1, \ldots, M \}$
+		
+		where $q_i$ and $s_i$ are conjunctions (`and') of 1-feature predicates
+		($q_i$ - `subspace descriptors'; $s_i$ - `decision logic rules')
+		
+		where $c_i$ are class labels
+		
+		There's a tie-breaking function if multiple sets apply to an instance (they chose rule that has higher agreement with black box) % TODO check how exactly that's defined
+		
+		There's a default class if no sets apply to an instance (they chose the majority class according to the black box) % TODO is this a majority given some set of instances
+		
+	\end{frame}
+
+	% Note: we are defining measures w.r.t. a two-level decision set \mathcal R with M rules,
+	% a black box \mathcal B, and a dataset \mathcal D = \{ \mathbf x_i | i \in 1, \ldots, N\}
+	%
+	% Fidelity: disagreement( \mathcal R ) = number of instances (in \mathcal D?) where
+	% \mathcal R and \mathcal B do not yield the same class c
+	%
+	% Unambiguity:
+	% ruleoverlap( \mathcal R ) : number of rules above 1 that explain an instance (instances?)
+	% cover( \mathcal R ) : coverage of the instance space by rules
+	% Unambiguity is achieved by max cover and min ruleoverlap
+	%
+	% Interpretability:
+	% size( \mathcal R ) = M
+	% maxwidth( \mathcal R ) = max\{ width(s_i), width(q_i) | (q_i, s_i, c_i) \in \mathcal R \}
+	% width( * ) is the number of predicates in *
+	% numpreds( \mathcal R ) = total number of predicates
+	% numdsets( \mathcal R ) = number of unique subspace descriptors
+	% featureoverlap( \mathcal R ) = sum featureoverlap(q, s) 
+
+	\begin{frame}
+		``Fidelity: A high fidelity explanation should faithfully mimic the
+		behavior of the black box model.''
+		
+		``Unambiguity: An unambiguous explanation should provide
+		unique deterministic rationales for describing how the black box
+		model behaves in various parts of the feature space.''
+		
+		``Interpretability: Interpretability metric quantifies how easy it
+		is to understand and reason about the explanation.''
+	\end{frame}
+
+	\begin{frame}
+		``In a two-level decision set, subspace descriptors and decision
+		logic rules have different semantic meanings i.e., each subspace
+		descriptor characterizes a specific region of the feature space, and
+		the corresponding inner if-then rules specify the decision logic of
+		the black box model within that region.''
+	\end{frame}
+
+	% TODO: Look up what apriori is and what it does (frequent set mining)
+
+% Motivation:
+%  (many good ml systems are black box)
+%  "chat vignette": what dis? cat! why? math! *confused* ; better explanation
+%
+%  (there is a need from)
+%  policymakers/legal: GDPR (find the ref)
+%  high-risk decision-makers: (doctors/critical systems/self-driving)
+%  explanations build trust (find a ref?)
+
+\begin{frame}{\textbf{Why} should we \textbf{explain} our models?}
+
+\begin{itemize}[<+->]
+	\item Many of the best-performing machine learning models are not (easily) \textbf{interpretable} (by non-ML experts)
+	\item Users need explanations:
+	\begin{itemize}
+		\item when using models for medical decisions
+		\item when using models for policymaking
+		\item in other high-risk decision support
+		\item for legal reasons
+	\end{itemize}
+\end{itemize}
+\pause
+
+\textbf{GDPR Article 13(2f)} [The data subject shall be informed of] the existence of automated decision-making [... and provided] meaningful information about the logic involved
+
+\begin{itemize}[<+->]
+	\item Explanations build trust in a good model
+	\item Explanations can help troubleshoot a bad model
+\end{itemize}
+\end{frame}
+
+%%% FRAMEBREAK %%%
+
+\begin{frame}{Troubleshooting a model at a glance}
+\vfill
+
+\centering
+\includegraphics[width=6cm]{LIME-wolf.png}
+
+\vfill
+
+\raggedleft
+\scriptsize
+Ribiero, Singh, and Guestrin, SIGKDD 2016
+\end{frame}
+
+%%% FRAMEBREAK %%%
+
+\begin{frame}{Interpretable models}
+\begin{columns}
+	\column[T]{0.45\textwidth}
+	\begin{center}\bf Interpretable \end{center} \pause
+	\begin{itemize}
+		\item Generalized linear models
+		\item[] $y = g^{-1}( X\beta )$ \pause
+		\item[] For each feature $i$, $\beta_i$ tells us about its contribution:
+		\begin{itemize}
+			\item sign (e.g. increase vs. decrease of a risk due to a factor)
+			\item magnitude (relative importance of features)
+		\end{itemize} \pause
+		\item Rules and decision trees
+		%\item [] example?
+	\end{itemize} \pause
+	
+	\column[T]{0.45\textwidth}
+	\begin{center}\textbf{Uninterpretable} or "black box"\end{center}
+	\centering
+	\only<5-6>{\includegraphics[height=2.5cm]{AI-Box.jpg}} \pause
+	\only<7->{\includegraphics[height=2.5cm]{glass-gear-box.png}}
+	\begin{itemize}
+		\item e.g. 3-layer neural network
+		\item[] $y = \sigma( W^1 \sigma( W^2 \sigma( W^3 X ) ) )$
+		\item[] \textbf{what does a particular value of $W^2_{ij}$ mean? \pause }
+		\item We can look in the box, but it's hard to interpret.
+	\end{itemize}
+	
+\end{columns}
+\vfill
+\scriptsize
+Image credit: \url{fico.com} ; \url{www.lindacohendesigns.com}
+\end{frame}
+  
+%%% FRAMEBREAK %%%
+
+\begin{frame}{Explanation}
+\begin{itemize}[<+->]
+	\item Uninterpretable $\rightarrow$ Interpretable
+	\item TREPAN (Craven and Shavlik, NIPS 1996)
+	\item[] Decision tree
+	\item LIME (Ribiero, Singh, and Guestrin, SIGKDD 2016)
+	\item[] (locally) Linear model
+	\item Anchors (Ribiero, Singh, and Guestrin, AAAI 2018)
+	\item[] Conjunctive rules
+\end{itemize}
+
+\end{frame}
+
+%%% FRAMEBREAK %%%
+
+\begin{frame}{TREPAN}
+\begin{columns}
+	\column{0.5\textwidth}
+	\begin{itemize}[<+->]
+		\item Learns a decision tree from a neural network (NN)
+		\item A big challenge to learning decision trees from data is that the amount of relevant samples decreases as the tree gets deeper
+		\item TREPAN uses the NN for an oracle to evaluate splits, eliminating this issue
+		\item Decision nodes ($n$) to expand are prioritized by
+		\item[] $\mathit{reach}( n ) \times (1 - \mathit{fidelity}(n) )$
+	\end{itemize}
+	\column{6cm}
+	\includegraphics[width=6cm]{trepan-title.png}
+	\includegraphics[width=6cm]{trepan-table.png}
+\end{columns}
+\end{frame}
+
+%%% FRAMEBREAK %%%
+
+\begin{frame}{LIME}
+\begin{columns}
+	\column{0.47\textwidth} \centering
+	\includegraphics[width=6cm]{LIME-title.png}
+	
+	{\color{UWRed}
+	\[
+	\arg \min_g \underbrace{ \mathcal L ( f, g, \pi_x ) }_{\text{fidelity loss around }x} + \underbrace{ \Omega( g ) }_\text{complexity}
+	\]}
+	
+	\includegraphics[width=6cm]{LIME-alg.png}
+	\column{0.47\textwidth} \centering
+	\includegraphics[width=6cm]{LIME-intuition.png}
+\end{columns}
+\end{frame}
+
+%%% FRAMEBREAK %%%
+
+\begin{frame}{LIME applied to images}
+\includegraphics[width=\textwidth]{LIME-image.png}
+\end{frame}
+
+%%% FRAMEBREAK %%%
+
+\begin{frame}{Anchors: High-Precision Model-Agnostic Explanations}
+\begin{columns}
+	\column{0.47\textwidth} \centering
+	\includegraphics[width=6cm]{anchors-fig1.png} \pause
+	\column{0.47\textwidth} \centering
+	\includegraphics[width=6cm]{anchors-pos.png} \pause
+	\includegraphics[width=6cm]{anchors-tab.png}	
+\end{columns}
+\end{frame}
+
+%%% FRAMEBREAK %%%
+
+\begin{frame}{Anchors: formal definition}
+
+\begin{itemize}
+	\item An anchor is a rule, formally expressed as a function $A : X \rightarrow \{0,1\}$ \pause
+	\item Given a black-box model $f : X \rightarrow Y$
+	\begin{itemize}
+		\item $X$ is the space of instances
+		\item $Y$ is the space of model outputs
+	\end{itemize} \pause
+	\item $A$  is an anchor iff
+	\item[] $\underbrace{\mathbb{E}_{\mathcal D (z | A)} \left[ \mathbf{1}_{f(x)=f(z)} \right] }_{\mathrm{Prec}(A)} \geq \tau$ when $A(x) = 1$
+\end{itemize}  \pause
+  That is, $A$ is a rule that holds for our sample $x$ and, for any $z$ in the data distribution $\mathcal D$ for which $A$ holds, the output is (probably) the same as for $x$. \pause
+  
+  To avoid computing the precision directly (intractable) a probabilistic criterion for an anchor is used:
+  \[
+  P( \mathrm{prec}(A) \geq \tau ) \geq 1 - \delta
+  \]
+  Since multiple rules can satisfy the criterion, the one with maximum coverage is picked:
+  \[
+  \max_{A \text{ s.t. } P(\mathrm{prec}(A) \geq \tau ) \geq 1 - \delta} \underbrace{ \mathbb E_{\mathcal D (z) } \left[ A(z) \right] }_{\mathrm{cov}(A)}
+  \]
+\end{frame}
+
+\begin{frame}{Searching for anchors}
+\begin{columns}
+	\column{0.47\textwidth}
+	\begin{itemize}
+		\item The authors present a greedy search for anchors
+		\begin{itemize}
+			\item does not explicitly maximize coverage
+			\item but shorter rules are found first, and shorter rules tend to have higher coverage
+		\end{itemize}
+		\item Next, they present a beam search that works on similar principles
+		\begin{itemize}
+			\item does explicitly maximize coverage
+		\end{itemize}
+	\end{itemize}
+	% TODO: KL-LUCB (look up? briefly describe? Kaufmann and Kalyanakrishnan 2013)
+	
+	\column{0.47\textwidth}
+	\includegraphics[width=6cm]{anchors-alg.png}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Anchors: simulated users} \centering
+\includegraphics[width=6cm]{anchors-simusers.png}
+\end{frame}
+\begin{frame}{Anchors: user study} \centering
+\includegraphics[width=\textwidth]{anchors-userstudy.png}
+\end{frame}
+
+%%% FRAMEBREAK %%%
+
+\begin{frame}{Anchors: reflection}
+\begin{itemize}
+	\item The approach is general: can be applied to any model targeting a variety of tasks, but
+	\item Some engineering is involved in:
+	\begin{itemize}
+		\item designing the perturbation distribution $\mathcal D$
+		\item defining what the "atoms" in the anchor rules are
+		\item deciding how to display anchors to the user
+	\end{itemize}
+	\item Various limitations pointed out by authors
+\end{itemize}
+\end{frame}
+
+\end{document}
