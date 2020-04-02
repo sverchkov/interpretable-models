@@ -9,3 +9,5 @@ latex/*.snm
 latex/*.synctex.gz
 latex/*.toc
 
+# Pycharm files
+.idea
