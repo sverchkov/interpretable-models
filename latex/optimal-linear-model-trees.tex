@@ -1,0 +1,39 @@
+\documentclass{article}
+
+\usepackage{amsmath,amsfonts}
+
+\title{Building the optimal linear model tree}
+
+\author{Yuriy Sverchkov}
+
+\begin{document}
+	\begin{abstract}
+		We present an efficient algorithm for learning a provably optimal model tree with linear regression models at the leaves.
+	\end{abstract}
+
+\section{Method}
+
+Let $M: \mathcal P( \mathcal X \times \mathbb R ) \rightarrow ( \mathcal X \rightarrow \mathbb R )$ be a learner that given a set of training samples $\{ \mathbf x, y | \mathbf x \in \mathcal X, y \in \mathbb R \}$ learns a linear model $f : \mathcal X \rightarrow \mathbb R$.
+Then, given a set of training samples, the optimal tree is that which minimizes
+\[ \sum_l \mathcal L( S_l ) \]
+where $l$ is an index over leaves, $S_l$ is the set of samples in a leaf, and $\mathcal L$ is the loss function for those samples, that is,
+\[ \mathcal L(S_l) = \sum_{ ( \mathbf x, y ) \in S_l } \mathcal L( f_l( \mathbf x ), y ) \]
+where $f_l = M( S_l )$ and the two-argument $\mathcal L$ is a typical loss function.
+
+\paragraph{Our hope} is that $\mathcal L( S_l )$ is expressible as a modular function, that is, for disjoint $A$ and $B$, $\mathcal L(A) + \mathcal L(B) = \mathcal L(A \cup B)$.
+
+\paragraph{Correction!} if that were true then every tree would have equal loss, that's bad.
+Maybe supermodular is what we want? ($\leq$).
+In any case, it isn't! We can easily imagine two sets of points with good regression lines combining into a blob with a bad regression line, and similarly, two sets of points with bad regression lines combining into a set of points with a good regression line!
+
+So what we instead want is $M(A \cup B)$ to be "easy" to compute given $A$ and $B$.
+
+\paragraph{If we're lucky} that would give us a way to build the tree bottom-up with dynamic programming.
+
+\subsection{Computing the regression}
+To make the computation of $M$ modular we hope to borrow from the SVM approach and re-express the regression in terms of dot products.
+This may seem like wasted overhead in a typical regression setting, but by pre-computing the dot products we hope to make the learning modular.
+
+\paragraph{Alternatively} we can use support vector regression at the leaves?
+
+\end{document}
