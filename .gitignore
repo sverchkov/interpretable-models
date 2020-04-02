@@ -9,5 +9,8 @@ latex/*.snm
 latex/*.synctex.gz
 latex/*.toc
 
+# Mac OS files
+.DS_Store
+
 # Pycharm files
 .idea
