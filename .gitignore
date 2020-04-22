@@ -14,3 +14,9 @@ latex/*.toc
 
 # Pycharm files
 .idea
+
+# Python-related
+venv
+
+# VSCode
+settings.json
