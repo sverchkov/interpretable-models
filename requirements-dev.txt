@@ -1,0 +1,1 @@
+generalizedtrees @ git+http://github.com/sverchkov/generalizedtrees.git@dev#egg=generalizedtrees
