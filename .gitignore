@@ -24,6 +24,7 @@ venv
 
 # Generated
 results
+html
 
 # Snakemake-related
 python-snakemake/.snakemake
