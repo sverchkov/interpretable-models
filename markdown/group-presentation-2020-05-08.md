@@ -1,10 +1,10 @@
-# Learning trees to explain models
-
-_Group Meeting_
-
-_May 8, 2020_
-
-_Yuriy Sverchkov_
+---
+title: Learning trees to explain models
+subtitle: Group Meeting
+date: May 8, 2020
+author: Yuriy Sverchkov
+revealjs-url: https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2
+---
 
 ## Model explanation
 
@@ -13,6 +13,9 @@ _Yuriy Sverchkov_
     * Random forests
     * Boosted models
     * Nonlinear SVMs
+
+---
+
 * There is a need in various settings to interpret model decisions
     * High-stakes decision making
         * Medical
@@ -47,9 +50,13 @@ Internal nodes represent conditions on features
     * One-or-rest for discrete features
     * Every-value split for discrete features
 
+---
+
 * Composite condition splits:
     * $m$-of-$n$ conditions
     * Linear function splits
+
+---
 
 * Future ideas:
     * Interval segmentation
@@ -74,9 +81,13 @@ Leaf nodes represent decisions
             * Tree depth
             * Data scarecity
             * Degenerate score
-    * Problems
-        * Maximizing the score at a higher node means possibly suboptimal choices lower down
-        * Training data at each decision dwindles as the tree grows
+
+### 
+
+#### Problems
+
+* Maximizing the score at a higher node means possibly suboptimal choices lower down
+* Training data at each decision dwindles as the tree grows
 
 ## Explanation tree learning
 
@@ -87,8 +98,9 @@ Leaf nodes represent decisions
         * __At each potential internal node, select a split that maximizes the score on data $(X, f(X))$__
             * Given a generator for $X$, we solve the data scarecity issue.
 
-* Other approaches:
-    * Frosst and Hinton 2017: Learn splits and leaves by gradient descent for a fixed tree skeleton
+----
+#### Other approaches:
+* Frosst and Hinton 2017: Learn splits and leaves by gradient descent for a fixed tree skeleton
 
 ## Decisions in learning an explaining decision tree
 
@@ -99,30 +111,10 @@ Leaf nodes represent decisions
 * Unlabeled data generator
 * Stopping criteria
 
-## The `generalizedtrees` python package
+## The [`generalizedtrees`](https://github.com/Craven-Biostat-Lab/generalizedtrees) python package
 
-* [https://github.com/Craven-Biostat-Lab/generalizedtrees]
 * Python package that implements a joint framework for all variants of tree learning and allows swapping in different components that correspond to each design decision.
-* Already implemented:
-    * Standard decision tree learning (verified against Scikit-Learn implementation)
-    * Basic model-tree learning
-    * Basic explanation (model translation) tree learning
 * Compatible with Scikit-Learn
-
-### `generalizedtrees` details: explanation tree learner
-
-* Input and parameters:
-    * Black-box classifier
-    * Data generator
-    * Impurity score function
-    * Sample size to use for learning splits
-    * Depth limit
-
-```{python}
-Explainer = make_trepanlike_classifier(classifier, generator)
-ex_tree = Explainer(s_min, max_depth, score)
-ex_tree.build()
-```
 
 ## Planned evaluations
 
