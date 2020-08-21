@@ -8,6 +8,10 @@ rule learn_explanation:
         data = "../datasets-and-models/models/data_{model}.joblib",
         feature_names = "../datasets-and-models/models/feature_names.joblib"
 
+    params:
+        balance_training = True,
+        balance_testing = True
+
     output:
         "../results/trepan-{model}.cloudpickle"
     
@@ -16,3 +20,16 @@ rule learn_explanation:
 
     script:
         "learn_trepan.py"
+
+rule plot_curve:
+    input:
+        model = "../datasets-and-models/models/model_{model}",
+        data = "../datasets-and-models/models/data_{model}.joblib",
+        explanation = "../results/trepan-{model}.cloudpickle"
+
+    output:
+        figure = "../results/trepan-{model}-rocs.png",
+        agreement = "../results/trepan-{model}-agreements.png"
+    
+    script:
+        "draw_rocs.py"

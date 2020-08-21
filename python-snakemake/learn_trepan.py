@@ -6,6 +6,7 @@ import logging
 
 import joblib
 import cloudpickle as cp
+import numpy as np
 import pandas as pd
 
 from generalizedtrees import Trepan
@@ -14,14 +15,8 @@ from generalizedtrees.features import FeatureSpec
 # Constants
 logger = logging.getLogger()
 
-def learn_trepan(data_path, model_path, features_path):
+def learn_trepan(data, model, feature_names):
     
-    # Load Data
-    logger.info('Loading data and model')
-    data = joblib.load(data_path)
-    model = joblib.load(model_path)
-    feature_names = joblib.load(features_path)
-
     # Build explainer
     logger.info('Initializing explainer class')
     explainer = Trepan(max_tree_size=20, use_m_of_n=False)
@@ -41,6 +36,8 @@ def learn_trepan(data_path, model_path, features_path):
     t1 = perf_counter()
     logger.info(f'Learned explanation in {t1 - t0} seconds.')
 
+    logger.info(f'Explanation:\n{explainer.show_tree()}')
+
     return explainer
 
 def save_trepan(trepan, path):
@@ -50,16 +47,52 @@ def save_trepan(trepan, path):
     
     logger.info('Saved explanation')
 
+
+def balance_sample(features, targets):
+
+    majority = False
+    n = sum(targets)
+
+    if n > len(targets)/2:
+        n = len(targets) - n
+        majority = True
+    
+    # Select n from majority class
+    idx = np.concatenate(
+        [(targets != majority).nonzero()[0],
+        np.random.default_rng().choice((targets == majority).nonzero()[0], size=n)])
+    logger.debug(f'Selecting indices:\n{idx}')
+
+    return features[idx, :], targets[idx]
+
+
+
 if __name__ == '__main__':
 
     try:
         snakemake
     except NameError:
-        print("This script should be called from snakemake.")
+        from sys import stderr
+        print("This script should be called from snakemake.", file=stderr)
         raise
     else:
 
         logging.basicConfig(level=logging.DEBUG, filename=snakemake.log[0])
 
-        model = learn_trepan(snakemake.input.data, snakemake.input.model, snakemake.input.feature_names)
-        save_trepan(model, snakemake.output[0])
+        # Load Data
+        logger.info('Loading data and model')
+
+        data = joblib.load(snakemake.input.data)
+        model = joblib.load(snakemake.input.model)
+        feature_names = joblib.load(snakemake.input.feature_names)
+
+        if snakemake.params.balance_training:
+            logger.info('Sampling a balanced training set')
+            data['train_features'], data['train_targets'] = balance_sample(data['train_features'], data['train_targets'])
+        
+        if snakemake.params.balance_testing:
+            logger.info('Sampling a balanced testing set')
+            data['test_features'], data['test_targets'] = balance_sample(data['test_features'], data['test_targets'])
+
+        explanation = learn_trepan(data, model, feature_names)
+        save_trepan(explanation, snakemake.output[0])
