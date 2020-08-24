@@ -8,6 +8,7 @@ import joblib
 import cloudpickle as cp
 import numpy as np
 import pandas as pd
+from sklearn.metrics import precision_recall_curve
 
 from generalizedtrees import Trepan
 from generalizedtrees.features import FeatureSpec
@@ -15,7 +16,7 @@ from generalizedtrees.features import FeatureSpec
 # Constants
 logger = logging.getLogger()
 
-def learn_trepan(data, model, feature_names):
+def learn_trepan(data, model, feature_names, use_optimal_threshold):
     
     # Build explainer
     logger.info('Initializing explainer class')
@@ -31,7 +32,24 @@ def learn_trepan(data, model, feature_names):
     logger.info('Learning explanation:')
     t0 = perf_counter()
 
-    explainer.fit(train_df, model.predict_proba)
+    if use_optimal_threshold:
+        # Find threshold with optimal f-score for model
+        pred_p = model.predict_proba(data['train_features'])
+        precision, recall, t = precision_recall_curve(data['train_targets'], pred_p[:,1])
+        f1 = 2 / (1/precision + 1/recall)
+        threshold = t[np.argmax(f1)]
+
+        logger.info(f'Using threshold of {threshold} in decision function')
+        
+        # Use threshold-based prediction as the oracle
+        def oracle(x):
+            w = model.predict_proba(x) > threshold
+            return np.column_stack((np.where(w, 0.0, 1.0), np.where(w, 1.0, 0.0)))
+            
+    else:
+        oracle = model.predict_proba
+
+    explainer.fit(train_df, oracle)
 
     t1 = perf_counter()
     logger.info(f'Learned explanation in {t1 - t0} seconds.')
@@ -86,6 +104,8 @@ if __name__ == '__main__':
         model = joblib.load(snakemake.input.model)
         feature_names = joblib.load(snakemake.input.feature_names)
 
+        use_optimal_threshold = getattr(snakemake.params, "optimal_threshold", False)
+
         if snakemake.params.balance_training:
             logger.info('Sampling a balanced training set')
             data['train_features'], data['train_targets'] = balance_sample(data['train_features'], data['train_targets'])
@@ -94,5 +114,5 @@ if __name__ == '__main__':
             logger.info('Sampling a balanced testing set')
             data['test_features'], data['test_targets'] = balance_sample(data['test_features'], data['test_targets'])
 
-        explanation = learn_trepan(data, model, feature_names)
+        explanation = learn_trepan(data, model, feature_names, use_optimal_threshold)
         save_trepan(explanation, snakemake.output[0])

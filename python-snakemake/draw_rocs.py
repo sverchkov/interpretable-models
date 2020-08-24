@@ -6,21 +6,15 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve
 import pandas as pd
 
-def draw_roc_curves(y_true, data, *models, out_file):
+def draw_roc_curves(y_true, predictions, out_file):
     
     fig, ax = plt.subplots()
 
-    for model in models:
-
-        predictions = model.predict_proba(data)
-        if isinstance(predictions, pd.DataFrame):
-            y_score = predictions.iloc[:,1]
-        else:
-            y_score = predictions[:,1]
+    for label, y_score in predictions.items():
 
         fpr, tpr, _ = roc_curve(y_true, y_score)
 
-        ax.plot(fpr, tpr, label=str(type(model)))
+        ax.plot(fpr, tpr, label=label)
     
     fig.legend()
     fig.savefig(out_file)
@@ -51,6 +45,11 @@ def draw_agreement_scatter(models, reference, out_file):
     fig.savefig(out_file)
 
 
+def cp_load(filename):
+    with open(filename) as f:
+        return cp.load(f)
+
+
 if __name__ == '__main__':
 
     try:
@@ -63,17 +62,19 @@ if __name__ == '__main__':
 
         model = joblib.load(snakemake.input.model)
         data = joblib.load(snakemake.input.data)
-        with open(snakemake.input.explanation, 'rb') as f:
-            explanation = cp.load(f)
+        explanations = {
+            label: cp_load(f) for label, f in
+            zip(snakemake.params.labels, snakemake.input.explanations)}
         
         # Compute predictions
-        predictions = {
-            "RF": get_p_of_1(model, data["test_features"]),
-            "Trepan": get_p_of_1(explanation, data["test_features"])
-        }
+        predictions = {"RF": get_p_of_1(model, data["test_features"])}
+        predictions.update({
+            label: get_p_of_1(explanation, data["test_features"])
+            for label, explanation in explanations.items()
+        })
 
         # Draw ROC curves
-        draw_roc_curves(data["test_targets"], data["test_features"], model, explanation, out_file=snakemake.output.figure)
+        draw_roc_curves(data["test_targets"], predictions, out_file=snakemake.output.roc)
 
         # Draw agreement w/ explanation
         draw_agreement_scatter(

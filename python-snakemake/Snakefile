@@ -21,14 +21,40 @@ rule learn_explanation:
     script:
         "learn_trepan.py"
 
+rule learn_trepan_optt:
+    input:
+        model = "../datasets-and-models/models/model_{model}",
+        data = "../datasets-and-models/models/data_{model}.joblib",
+        feature_names = "../datasets-and-models/models/feature_names.joblib"
+
+    params:
+        balance_training = True,
+        balance_testing = True,
+        optimal_threshold = True
+
+    output:
+        "../results/trepan-ot-{model}.cloudpickle"
+    
+    log:
+        "logs/trepan-ot-{model}-log.txt"
+
+    script:
+        "learn_trepan.py"
+
 rule plot_curve:
     input:
         model = "../datasets-and-models/models/model_{model}",
         data = "../datasets-and-models/models/data_{model}.joblib",
-        explanation = "../results/trepan-{model}.cloudpickle"
+        explanations = [
+            "../results/trepan-{model}.cloudpickle",
+            "../results/trepan-ot-{model}.cloudpickle"
+        ]
+    
+    params:
+        labels = ['trepan', 'trapan-ot']
 
     output:
-        figure = "../results/trepan-{model}-rocs.png",
+        roc = "../results/trepan-{model}-rocs.png",
         agreement = "../results/trepan-{model}-agreements.png"
     
     script:
