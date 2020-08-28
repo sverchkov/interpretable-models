@@ -1,9 +1,11 @@
 ---
-title: Permutation-based feature importances can be misleading
+title: Here be dragons
 subtitle: Craven Group meeting
 author: Yuriy Sverchkov
 date: August 28, 2020
 revealjs-url: https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2
+theme: white
+slideNumber: true
 ---
 
 ### Please Stop Permuting Features: An Explanation and Alternatives
@@ -61,7 +63,10 @@ For $f(x) = \hat \beta_0 + \sum_{j=1}^p \hat \beta_j x_j$ fit by least squares
 
 ### Ground truth model
 
-$$y_i = x_{i1} + x_{i2} + x_{i4} + x_{i5} + 0 x_{i6} + 0.5 x_{i7} + 0.8 x_{i8} + 1.2 x_{i9} + 1.5 x_{i10} + \epsilon_i$$
+$$\begin{array}{r}
+    y_i = x_{i1} + x_{i2} + x_{i3} + x_{i4} + x_{i5} + 0 x_{i6} \\
+    + 0.8 x_{i8} + 1.2 x_{i9} + 1.5 x_{i10} + \epsilon_i
+    \end{array}$$
 
 Expected feature importance ranking:
 
@@ -69,17 +74,21 @@ $$10 \succ 9 \succ 1 = 2 = 3 = 4 = 5 \succ 8 \succ 7 \succ 6$$
 
 ### Ground truth model
 
-$$y_i = x_{i1} + x_{i2} + x_{i4} + x_{i5} + 0 x_{i6} + 0.5 x_{i7} + 0.8 x_{i8} + 1.2 x_{i9} + 1.5 x_{i10} + \epsilon_i$$
+$$\begin{array}{r}
+    y_i = x_{i1} + x_{i2} + x_{i3} + x_{i4} + x_{i5} + 0 x_{i6} \\
+    + 0.8 x_{i8} + 1.2 x_{i9} + 1.5 x_{i10} + \epsilon_i
+    \end{array}$$
 
 * $\epsilon_i \sim N(0, 0.1^2)$
 * $x_{ij} \sim \textrm{Uniform}[0,1]$
 * $x_{i1}, x_{i2}$ correlated by a Gaussian copula
 
 ### Gaussian copula
+![](https://upload.wikimedia.org/wikipedia/commons/e/e2/Gaussian_Copula_PDF.png)
 
 ### Simulation results: Variable Importance
 
-![Hooker and Mentch (2019) Figure 1](../images/hooker2019fig1.png)
+![](../images/hooker2019fig1.png)
 
 ---
 
@@ -91,11 +100,11 @@ here we see them depend on the feature distribution.
 
 ### Simulation results: Partial Dependence Plots
 
-![Hooker and Mentch (2019) Figure 3 left](../images/hooker2019fig3a.png)
+![](../images/hooker2019fig3a.png)
 
 ### Simulation results: Individual Conditional Expectation Plots
 
-![Hooker and Mentch (2019) Figure 3 right](../images/hooker2019fig3b.png)
+![](../images/hooker2019fig3b.png)
 
 ---
 
@@ -110,19 +119,19 @@ $$y = x_1 + 0 x_2 + \epsilon$$
 
 ### RF learned:
 
-![Hooker and Mentch (2019) Figure 4](../images/hooker2019fig4.png)
+![](../images/hooker2019fig4.png)
 
 ### RF ICE+PDP
 
-![Hooker and Mentch (2019) Figure 6 right](../images/hooker2019fig6b.png)
+![](../images/hooker2019fig6b.png)
 
 ### NN learned:
 
-![Hooker and Mentch (2019) Figure 5](../images/hooker2019fig5.png)
+![](../images/hooker2019fig5.png)
 
 ### NN ICE+PDP
 
-![Hooker and Mentch (2019) Figure 6 left](../images/hooker2019fig6a.png)
+![](../images/hooker2019fig6a.png)
 
 ### Lessons
 
@@ -139,5 +148,81 @@ $$y = x_1 + 0 x_2 + \epsilon$$
 
 ---
 
-![Hooker and Mentch (2019) Figure 7 left](../images/hooker2019fig7.png)
+![](../images/hooker2019fig7.png)
 
+### Exploiting out-of-distribution predictions
+
+---
+
+![](../images/slack2020title.png)
+
+### Setting
+
+* __An adversary__ wants to deploy a (colloquially) biased classifier $f$ for making critical decisions (e.g. parole, bail, credit)
+
+* The adversary will provide their classifier as a black box
+
+* Customers and regulators will use explanation methods (e.g. LIME and SHAP) to determine if the black box is suitable to be deployed (check that it is not biased)
+
+---
+
+The adversary can succeed by constructing a classifier $e$ that predicts like $f$ (is biased) on real data, but LIME and SHAP won't identify it as using protected features.
+
+### LIME and SHAP
+
+Find an interpretable model $g$ to explain the prediction of a black box $f$ for an instance $x$:
+
+$$\mathop{\arg \min}_{g \in \mathcal G} L(f, g, \pi_x) + \Omega(g)$$
+
+* $\mathcal G$ - class of interpretable (linear) models
+* $\Omega$ - complexity of model
+* $L$ - fidelity loss
+
+### LIME and SHAP
+
+* $L$ - fidelity loss:
+
+$$L(f,g,\pi_x) = \sum_{x' \in X'} \left(f(x') - g(x')\right)^2\pi_x(x')$$
+
+* $\pi_x$ - proximity to $x$
+* $X'$ - synthetic points making up the neighborhood of $x$
+
+### Adversarial black box
+
+$$e(x) = f(x)\delta(x) + \psi(x)(1-\delta(x)) =
+    \begin{cases}
+        f(x) & \text{if } x \in \mathcal X_\mathrm{dist} \\
+        \psi(x) & \text{otherwise}
+    \end{cases}$$
+
+* $f$ - biased classifier (uses sensitive features)
+* $\psi$ - classifier uncorrelated with sensitive features
+* $\delta$ - out-of-distribution classifier
+
+---
+
+![](../images/slack2020fig1.png)
+
+### Experiments: datasets
+
+![](../images/slack2020tab1.png)
+
+### Experiments: COMPAS
+
+![](../images/slack2020fig2a.png)
+
+### Experiments: COMPAS
+
+![](../images/slack2020fig2b.png)
+
+### Experiments: Communities & Crime
+
+![](../images/slack2020fig3a.png)
+
+### Experiments: Communities & Crime
+
+![](../images/slack2020fig3b.png)
+
+### Experiments: German Credit
+
+![](../images/slack2020fig4.png)
