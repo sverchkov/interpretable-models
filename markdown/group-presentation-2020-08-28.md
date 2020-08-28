@@ -84,7 +84,7 @@ $$\begin{array}{r}
 * $x_{i1}, x_{i2}$ correlated by a Gaussian copula
 
 ### Gaussian copula
-![](https://upload.wikimedia.org/wikipedia/commons/e/e2/Gaussian_Copula_PDF.PNG)
+![](https://upload.wikimedia.org/wikipedia/commons/e/e2/Gaussian_Copula_PDF.png)
 
 ### Simulation results: Variable Importance
 
