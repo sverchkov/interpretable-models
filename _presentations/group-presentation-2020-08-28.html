@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Yuriy Sverchkov">
+  <meta name="dcterms.date" content="2020-08-28">
+  <title>Here be dragons</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/css/reset.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/css/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/css/theme/black.css" id="theme">
+  <!-- Printing and PDF exports -->
+  <script>
+    var link = document.createElement( 'link' );
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match( /print-pdf/gi ) ? 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/css/print/pdf.css' : 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/css/print/paper.css';
+    document.getElementsByTagName( 'head' )[0].appendChild( link );
+  </script>
+  <!--[if lt IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/lib/js/html5shiv.js"></script>
+  <![endif]-->
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide">
+  <h1 class="title">Here be dragons</h1>
+  <p class="subtitle">Craven Group meeting</p>
+  <p class="author">Yuriy Sverchkov</p>
+  <p class="date">August 28, 2020</p>
+</section>
+
+<section id="please-stop-permuting-features-an-explanation-and-alternatives" class="slide level3">
+<h3>Please Stop Permuting Features: An Explanation and Alternatives</h3>
+<h4 id="giles-hooker-and-lucas-mentch-2019">Giles Hooker and Lucas Mentch, 2019</h4>
+<blockquote>
+<p>When features in the training set exhibit statistical dependence, permutation methods can be highly misleading when applied to the original model.</p>
+</blockquote>
+<p><span class="math inline">\(\require{boldsymbol}\)</span></p>
+</section>
+<section id="feature-importance" class="slide level3">
+<h3>Feature importance</h3>
+<p>Given a model <span class="math inline">\(f : \mathcal X \rightarrow \mathcal Y\)</span> where <span class="math inline">\(\mathcal X\)</span> is made up of multiple features, quantify, for each feature <span class="math inline">\(j\)</span>, its contribution to the prediction.</p>
+</section>
+<section id="variable-importance" class="slide level3">
+<h3>Variable Importance</h3>
+<p>Breiman (2001)</p>
+<ul>
+<li><span class="math inline">\(\color{Skyblue} X\)</span> - feature matrix</li>
+<li><span class="math inline">\(\color{Lavender} X^{\pi, j}\)</span> - feature matrix with <span class="math inline">\(j\)</span>-th feature (column) permuted</li>
+<li><span class="math inline">\(\boldsymbol x_i\)</span> - <span class="math inline">\(i\)</span>-th instance (row)</li>
+</ul>
+<p><span class="math display">\[VI_j^\pi =
+    \sum_{i=1}^N
+    {\color{Lavender}
+    \underbrace{
+        L(y_i, f(\boldsymbol x_i^{\pi,j}))
+    }_\text{Loss on permuted data}}
+    - {\color{Skyblue}
+    \underbrace{
+        L(y_i, f(\boldsymbol x_i))
+    }_\text{Loss on original data}}\]</span></p>
+</section>
+<section id="partial-dependence-plots" class="slide level3">
+<h3>Partial Dependence Plots</h3>
+<p>Friedman (2001)</p>
+<ul>
+<li><span class="math inline">\(X^{x,j}\)</span> - feature matrix with <span class="math inline">\(j\)</span>-th feature set to <span class="math inline">\(x\)</span> for all instances</li>
+</ul>
+<p><span class="math display">\[PD_j(x) = \frac{1}{N} \sum_{i=1}^N f(\boldsymbol x_i^{x,j})\]</span></p>
+</section>
+<section id="individual-conditional-expectation" class="slide level3">
+<h3>Individual Conditional Expectation</h3>
+<p>Goldstein et al. (2015)</p>
+<p><span class="math display">\[ICE_{i,j}(x) = f(\boldsymbol x_i^{x,j})\]</span></p>
+</section>
+<section id="theorem-1." class="slide level3">
+<h3>Theorem 1.</h3>
+<p>For <span class="math inline">\(f(x) = \hat \beta_0 + \sum_{j=1}^p \hat \beta_j x_j\)</span> fit by least squares</p>
+<ol type="1">
+<li><span class="math inline">\(E_\pi VI_j^\pi = 2\hat \beta^2_j \sum_{i=1}^n (x_{ij} - \bar x_j)^2 \propto \hat \beta_j^2 \mathrm{Var}(x_{j})\)</span></li>
+<li><span class="math inline">\(PD_j(x) = C_j + \hat \beta_j x\)</span> where <span class="math inline">\(C_j = \sum_{j&#39; \neq j} \hat \beta_{j&#39;} x_{ij&#39;}\)</span></li>
+<li><span class="math inline">\(ICE_{i,j}(x) = C_{i,j} + \hat \beta_j x\)</span> where <span class="math inline">\(C_{i,j} = \sum_{j&#39; \neq j} \hat \beta_{j&#39;} x_{ij&#39;}\)</span></li>
+</ol>
+</section>
+<section id="ground-truth-model" class="slide level3">
+<h3>Ground truth model</h3>
+<p><span class="math display">\[\begin{array}{r}
+    y_i = x_{i1} + x_{i2} + x_{i3} + x_{i4} + x_{i5} + 0 x_{i6} + 0.5 x_{i7} \\
+    + 0.8 x_{i8} + 1.2 x_{i9} + 1.5 x_{i10} + \epsilon_i
+    \end{array}\]</span></p>
+<p>Expected feature importance ranking:</p>
+<p><span class="math display">\[10 \succ 9 \succ 1 = 2 = 3 = 4 = 5 \succ 8 \succ 7 \succ 6\]</span></p>
+</section>
+<section id="ground-truth-model-1" class="slide level3">
+<h3>Ground truth model</h3>
+<p><span class="math display">\[\begin{array}{r}
+    y_i = x_{i1} + x_{i2} + x_{i3} + x_{i4} + x_{i5} + 0 x_{i6} + 0.5 x_{i7} \\
+    + 0.8 x_{i8} + 1.2 x_{i9} + 1.5 x_{i10} + \epsilon_i
+    \end{array}\]</span></p>
+<ul>
+<li><span class="math inline">\(\epsilon_i \sim N(0, 0.1^2)\)</span></li>
+<li><span class="math inline">\(x_{ij} \sim \textrm{Uniform}[0,1]\)</span></li>
+<li><span class="math inline">\(x_{i1}, x_{i2}\)</span> correlated by a Gaussian copula</li>
+</ul>
+</section>
+<section id="gaussian-copula" class="slide level3">
+<h3>Gaussian copula</h3>
+<p><img data-src="https://upload.wikimedia.org/wikipedia/commons/e/e2/Gaussian_Copula_PDF.png" /></p>
+</section>
+<section id="simulation-results-variable-importance" class="slide level3">
+<h3>Simulation results: Variable Importance</h3>
+<p><img data-src="../images/hooker2019fig1.png" /></p>
+</section>
+<section class="slide level3">
+
+<p>Features 1 and 2 are correctly ranked when they are uncorrelated, but are ranked higher by nonlinear models when correlated.</p>
+</section>
+<section id="simulation-results-partial-dependence-plots" class="slide level3">
+<h3>Simulation results: Partial Dependence Plots</h3>
+<p><img data-src="../images/hooker2019fig3a.png" /></p>
+</section>
+<section id="simulation-results-individual-conditional-expectation-plots" class="slide level3">
+<h3>Simulation results: Individual Conditional Expectation Plots</h3>
+<p><img data-src="../images/hooker2019fig3b.png" /></p>
+</section>
+<section class="slide level3">
+
+<p>The dependence of <span class="math inline">\(f(\boldsymbol x)\)</span> on <span class="math inline">\(x_1\)</span> is well-behaved near the source data distribution, and fluctuates outside it.</p>
+</section>
+<section id="a-simpler-example" class="slide level3">
+<h3>A simpler example</h3>
+<p><span class="math display">\[y = x_1 + 0 x_2 + \epsilon\]</span></p>
+<ul>
+<li><span class="math inline">\(\epsilon \sim N(0, 0.05)\)</span></li>
+<li><span class="math inline">\(x_1, x_2\)</span> linked by Gaussian copula with correlation 0.9</li>
+</ul>
+</section>
+<section id="rf-learned" class="slide level3">
+<h3>RF learned:</h3>
+<p><img data-src="../images/hooker2019fig4.png" /></p>
+</section>
+<section id="rf-icepdp" class="slide level3">
+<h3>RF ICE+PDP</h3>
+<p><img data-src="../images/hooker2019fig6b.png" /></p>
+</section>
+<section id="nn-learned" class="slide level3">
+<h3>NN learned:</h3>
+<p><img data-src="../images/hooker2019fig5.png" /></p>
+</section>
+<section id="nn-icepdp" class="slide level3">
+<h3>NN ICE+PDP</h3>
+<p><img data-src="../images/hooker2019fig6a.png" /></p>
+</section>
+<section id="lessons" class="slide level3">
+<h3>Lessons</h3>
+<ul>
+<li>Dependence between input features concentrates data in a subset of the space spanned by permuted datasets</li>
+<li>Variable importance computed by a permutate-and-predict strategy depends on evaluating <span class="math inline">\(f(\boldsymbol x)\)</span> out-of-distribution</li>
+<li>Out-of distribution predictions of complex models may be unpredictable</li>
+</ul>
+</section>
+<section id="variable-importance-alternatives" class="slide level3">
+<h3>Variable importance alternatives</h3>
+<ul>
+<li>Permute/perturb conditionally (keeping the generated samples in-distribution)</li>
+<li>Remove and relearn</li>
+<li>Permute and relearn</li>
+<li>Condition and relearn</li>
+</ul>
+</section>
+<section class="slide level3">
+
+<p><img data-src="../images/hooker2019fig7.png" /></p>
+</section>
+<section id="exploiting-out-of-distribution-predictions" class="slide level3">
+<h3>Exploiting out-of-distribution predictions</h3>
+</section>
+<section class="slide level3">
+
+<p><img data-src="../images/slack2020title.png" /></p>
+</section>
+<section id="setting" class="slide level3">
+<h3>Setting</h3>
+<ul>
+<li><p><strong>An adversary</strong> wants to deploy a (colloquially) biased classifier <span class="math inline">\(f\)</span> for making critical decisions (e.g. parole, bail, credit)</p></li>
+<li><p>The adversary will provide their classifier as a black box</p></li>
+<li><p>Customers and regulators will use explanation methods (e.g. LIME and SHAP) to determine if the black box is suitable to be deployed (check that it is not biased)</p></li>
+</ul>
+</section>
+<section class="slide level3">
+
+<p>The adversary can succeed by constructing a classifier <span class="math inline">\(e\)</span> that predicts like <span class="math inline">\(f\)</span> (is biased) on real data, but LIME and SHAP won’t identify it as using protected features.</p>
+</section>
+<section id="lime-and-shap" class="slide level3">
+<h3>LIME and SHAP</h3>
+<p>Find an interpretable model <span class="math inline">\(\color{skyblue} g\)</span> to explain the prediction of a black box <span class="math inline">\(\color{SeaGreen} f\)</span> for an instance <span class="math inline">\(x\)</span>:</p>
+<p><span class="math display">\[\mathop{\arg \min}_{\color{skyblue} g \in \mathcal G}
+    {\color{Goldenrod} L}(
+        {\color{SeaGreen} f},
+        {\color{skyblue} g},
+        {\color{Apricot} \pi_x}) +
+    {\color{Lavender} \Omega}({\color{skyblue} g})\]</span></p>
+<ul>
+<li><span class="math inline">\(\color{skyblue} \mathcal G\)</span> - class of interpretable (linear) models</li>
+<li><span class="math inline">\(\color{Lavender} \Omega\)</span> - complexity of model</li>
+<li><span class="math inline">\(\color{Goldenrod} L\)</span> - fidelity loss</li>
+</ul>
+</section>
+<section id="lime-and-shap-1" class="slide level3">
+<h3>LIME and SHAP</h3>
+<ul>
+<li><span class="math inline">\(\color{Goldenrod} L\)</span> - fidelity loss:</li>
+</ul>
+<p><span class="math display">\[{\color{Goldenrod} L}(
+        {\color{SeaGreen} f},
+        {\color{skyblue} g},
+        {\color{Apricot} \pi_x})
+    = \sum_{\color{Lavender} x&#39; \in X&#39;} \left(
+        {\color{SeaGreen} f}({\color{Lavender} x&#39;})
+        - {\color{SkyBlue} g}({\color{Lavender} x&#39;})
+    \right)^2 {\color{Apricot} \pi_x({\color{Lavender} x&#39;})}\]</span></p>
+<ul>
+<li><span class="math inline">\({\color{Apricot} \pi_x}\)</span> - proximity to <span class="math inline">\(x\)</span></li>
+<li><span class="math inline">\(\color{Lavender} X&#39;\)</span> - synthetic points making up the neighborhood of <span class="math inline">\(x\)</span></li>
+</ul>
+</section>
+<section id="adversarial-black-box" class="slide level3">
+<h3>Adversarial black box</h3>
+<p><span class="math display">\[e(x) = {\color{SeaGreen} f(x)}{\color{SkyBlue}\delta(x)} + {\color{Goldenrod} \psi(x)}{\color{SkyBlue}(1-\delta(x))} =
+    \begin{cases}
+        \color{SeaGreen} f(x) &amp; \color{SeaGreen} \text{if } x \in \mathcal X_\mathrm{dist} \\
+        \color{Goldenrod} \psi(x) &amp; \color{Goldenrod} \text{otherwise}
+    \end{cases}\]</span></p>
+<ul>
+<li><span class="math inline">\({\color{SeaGreen} f}\)</span> - biased classifier (uses sensitive features)</li>
+<li><span class="math inline">\({\color{Goldenrod} \psi}\)</span> - classifier uncorrelated with sensitive features</li>
+<li><span class="math inline">\(\color{SkyBlue} \delta\)</span> - out-of-distribution classifier</li>
+</ul>
+</section>
+<section class="slide level3">
+
+<p><img data-src="../images/slack2020fig1.png" /></p>
+</section>
+<section id="experiments-datasets" class="slide level3">
+<h3>Experiments: datasets</h3>
+<p><img data-src="../images/slack2020tab1.png" /></p>
+</section>
+<section id="experiments-compas" class="slide level3">
+<h3>Experiments: COMPAS</h3>
+<p><img data-src="../images/slack2020fig2a.png" /></p>
+</section>
+<section id="experiments-compas-1" class="slide level3">
+<h3>Experiments: COMPAS</h3>
+<p><img data-src="../images/slack2020fig2b.png" /></p>
+</section>
+<section id="experiments-communities-crime" class="slide level3">
+<h3>Experiments: Communities &amp; Crime</h3>
+<p><img data-src="../images/slack2020fig3a.png" /></p>
+</section>
+<section id="experiments-communities-crime-1" class="slide level3">
+<h3>Experiments: Communities &amp; Crime</h3>
+<p><img data-src="../images/slack2020fig3b.png" /></p>
+</section>
+<section id="experiments-german-credit" class="slide level3">
+<h3>Experiments: German Credit</h3>
+<p><img data-src="../images/slack2020fig4.png" /></p>
+</section>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        // Display the page number of the current slide
+        slideNumber: true,
+        // Push each slide change to the browser history
+        history: true,
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/plugin/zoom-js/zoom.js', async: true },
+          { src: 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/plugin/math/math.js', async: true },
+          { src: 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/plugin/notes/notes.js', async: true }
+        ]
+      });
+    </script>
+    </body>
+</html>
