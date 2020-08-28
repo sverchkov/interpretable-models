@@ -88,7 +88,7 @@ $$\begin{array}{r}
 
 ### Simulation results: Variable Importance
 
-![](../images/hooker2019fig1.PNG)
+![](../images/hooker2019fig1.png)
 
 ---
 
@@ -97,11 +97,11 @@ but are ranked higher by nonlinear models when correlated.
 
 ### Simulation results: Partial Dependence Plots
 
-![](../images/hooker2019fig3a.PNG)
+![](../images/hooker2019fig3a.png)
 
 ### Simulation results: Individual Conditional Expectation Plots
 
-![](../images/hooker2019fig3b.PNG)
+![](../images/hooker2019fig3b.png)
 
 ---
 
@@ -116,19 +116,19 @@ $$y = x_1 + 0 x_2 + \epsilon$$
 
 ### RF learned:
 
-![](../images/hooker2019fig4.PNG)
+![](../images/hooker2019fig4.png)
 
 ### RF ICE+PDP
 
-![](../images/hooker2019fig6b.PNG)
+![](../images/hooker2019fig6b.png)
 
 ### NN learned:
 
-![](../images/hooker2019fig5.PNG)
+![](../images/hooker2019fig5.png)
 
 ### NN ICE+PDP
 
-![](../images/hooker2019fig6a.PNG)
+![](../images/hooker2019fig6a.png)
 
 ### Lessons
 
@@ -145,13 +145,13 @@ $$y = x_1 + 0 x_2 + \epsilon$$
 
 ---
 
-![](../images/hooker2019fig7.PNG)
+![](../images/hooker2019fig7.png)
 
 ### Exploiting out-of-distribution predictions
 
 ---
 
-![](../images/slack2020title.PNG)
+![](../images/slack2020title.png)
 
 ### Setting
 
@@ -210,28 +210,28 @@ $$e(x) = {\color{SeaGreen} f(x)}{\color{SkyBlue}\delta(x)} + {\color{Goldenrod} 
 
 ---
 
-![](../images/slack2020fig1.PNG)
+![](../images/slack2020fig1.png)
 
 ### Experiments: datasets
 
-![](../images/slack2020tab1.PNG)
+![](../images/slack2020tab1.png)
 
 ### Experiments: COMPAS
 
-![](../images/slack2020fig2a.PNG)
+![](../images/slack2020fig2a.png)
 
 ### Experiments: COMPAS
 
-![](../images/slack2020fig2b.PNG)
+![](../images/slack2020fig2b.png)
 
 ### Experiments: Communities & Crime
 
-![](../images/slack2020fig3a.PNG)
+![](../images/slack2020fig3a.png)
 
 ### Experiments: Communities & Crime
 
-![](../images/slack2020fig3b.PNG)
+![](../images/slack2020fig3b.png)
 
 ### Experiments: German Credit
 
-![](../images/slack2020fig4.PNG)
+![](../images/slack2020fig4.png)
