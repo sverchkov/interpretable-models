@@ -11,6 +11,8 @@ revealjs-url: https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2
 
 > When features in the training set exhibit statistical dependence, permutation methods can be highly misleading when applied to the original model.
 
+$\require{boldsymbol}$
+
 ### Feature importance
 
 Given a model $f : \mathcal X \rightarrow \mathcal Y$ where $\mathcal X$ is made up of multiple features,
@@ -20,14 +22,122 @@ quantify, for each feature $j$, its contribution to the prediction.
 
 Breiman (2001)
 
-$$VI_j^\pi = \sum_{i=1}^N L(y_i, f(\mathbf x_i^{\pi,j})) -  L(y_i, f(\mathbf x_i))$$
+* $X$ - feature matrix
+* $X^{\pi, j}$ - feature matrix with $j$-th feature (column) permuted
+* $\boldsymbol x_i$ - $i$-th instance (row)
+
+$$VI_j^\pi =
+    \sum_{i=1}^N
+    {\color{Lavender}
+    \underbrace{
+        L(y_i, f(\boldsymbol x_i^{\pi,j}))
+    }_\text{Loss on permuted data}}
+    - {\color{Skyblue}
+    \underbrace{
+        L(y_i, f(\boldsymbol x_i))
+    }_\text{Loss on original data}}$$
+
+### Partial Dependence Plots
+
+Friedman (2001)
+
+* $X^{x,j}$ - feature matrix with $j$-th feature set to $x$ for all instances
+
+$$PD_j(x) = \frac{1}{N} \sum_{i=1}^N f(\boldsymbol x_i^{x,j})$$
+
+### Individual Conditional Expectation
+
+Goldstein et al. (2015)
+
+$$ICE_{i,j}(x) = f(\boldsymbol x_i^{x,j})$$
+
+### Theorem 1.
+
+For $f(x) = \hat \beta_0 + \sum_{j=1}^p \hat \beta_j x_j$ fit by least squares
+
+1. $E_\pi VI_j^\pi = 2\hat \beta^2_j \sum_{i=1}^n (x_{ij} - \bar x_j)^2$
+2. $PD_j(x) = C_j + \hat \beta_j x$ where $C_j = \sum_{j' \neq j} \hat \beta_{j'} x_{ij'}$
+3. $ICE_{i,j}(x) = C_{i,j} + \hat \beta_j x$ where $C_{i,j} = \sum_{j' \neq j} \hat \beta_{j'} x_{ij'}$
 
 ### Ground truth model
 
+$$y_i = x_{i1} + x_{i2} + x_{i4} + x_{i5} + 0 x_{i6} + 0.5 x_{i7} + 0.8 x_{i8} + 1.2 x_{i9} + 1.5 x_{i10} + \epsilon_i$$
+
+Expected feature importance ranking:
+
+$$10 \succ 9 \succ 1 = 2 = 3 = 4 = 5 \succ 8 \succ 7 \succ 6$$
+
+### Ground truth model
+
+$$y_i = x_{i1} + x_{i2} + x_{i4} + x_{i5} + 0 x_{i6} + 0.5 x_{i7} + 0.8 x_{i8} + 1.2 x_{i9} + 1.5 x_{i10} + \epsilon_i$$
+
+* $\epsilon_i \sim N(0, 0.1^2)$
+* $x_{ij} \sim \textrm{Uniform}[0,1]$
+* $x_{i1}, x_{i2}$ correlated by a Gaussian copula
+
 ### Gaussian copula
 
-### Predictions outside the training set
+### Simulation results: Variable Importance
 
-### Gibbs effects
+![Hooker and Mentch (2019) Figure 1](../images/hooker2019fig1.png)
 
-(Neural network as a higher-order polynomial)
+---
+
+Features 1 and 2 are correctly ranked when they are uncorrelated,
+but are ranked higher by nonlinear models when correlated.
+
+Feature importances are a tool for examining $f(\boldsymbol x)$;
+here we see them depend on the feature distribution.
+
+### Simulation results: Partial Dependence Plots
+
+![Hooker and Mentch (2019) Figure 3 left](../images/hooker2019fig3a.png)
+
+### Simulation results: Individual Conditional Expectation Plots
+
+![Hooker and Mentch (2019) Figure 3 right](../images/hooker2019fig3b.png)
+
+---
+
+The dependence of $f(\boldsymbol x)$ on $x_1$ is well-behaved near the source data distribution, and fluctuates outside it.
+
+### A simpler example
+
+$$y = x_1 + 0 x_2 + \epsilon$$
+
+* $\epsilon \sim N(0, 0.05)$
+* $x_1, x_2$ linked by Gaussian copula with correlation 0.9
+
+### RF learned:
+
+![Hooker and Mentch (2019) Figure 4](../images/hooker2019fig4.png)
+
+### RF ICE+PDP
+
+![Hooker and Mentch (2019) Figure 6 right](../images/hooker2019fig6b.png)
+
+### NN learned:
+
+![Hooker and Mentch (2019) Figure 5](../images/hooker2019fig5.png)
+
+### NN ICE+PDP
+
+![Hooker and Mentch (2019) Figure 6 left](../images/hooker2019fig6a.png)
+
+### Lessons
+
+* Dependence between input features concentrates data in a subset of the space spanned by permuted datasets
+* Variable importance computed by a permutate-and-predict strategy depends on evaluating $f(\boldsymbol x)$ out-of-distribution
+* Out-of distribution predictions of complex models may be unpredictable
+
+### Variable importance alternatives
+
+* Permute/perturb conditionally (keeping the generated samples in-distribution)
+* Remove and relearn
+* Permute and relearn
+* Condition and relearn
+
+---
+
+![Hooker and Mentch (2019) Figure 7 left](../images/hooker2019fig7.png)
+
