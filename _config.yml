@@ -1,5 +1,5 @@
-defaults:
-  - scope:
-      path: "images"
-    values:
-      output: true
+collections:
+  presentations:
+    output: true
+  images:
+    output: true
