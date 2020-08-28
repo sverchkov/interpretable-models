@@ -84,11 +84,11 @@ $$\begin{array}{r}
 * $x_{i1}, x_{i2}$ correlated by a Gaussian copula
 
 ### Gaussian copula
-![](https://upload.wikimedia.org/wikipedia/commons/e/e2/Gaussian_Copula_PDF.png)
+![](https://upload.wikimedia.org/wikipedia/commons/e/e2/Gaussian_Copula_PDF.PNG)
 
 ### Simulation results: Variable Importance
 
-![](../images/hooker2019fig1.png)
+![](../images/hooker2019fig1.PNG)
 
 ---
 
@@ -97,11 +97,11 @@ but are ranked higher by nonlinear models when correlated.
 
 ### Simulation results: Partial Dependence Plots
 
-![](../images/hooker2019fig3a.png)
+![](../images/hooker2019fig3a.PNG)
 
 ### Simulation results: Individual Conditional Expectation Plots
 
-![](../images/hooker2019fig3b.png)
+![](../images/hooker2019fig3b.PNG)
 
 ---
 
@@ -116,19 +116,19 @@ $$y = x_1 + 0 x_2 + \epsilon$$
 
 ### RF learned:
 
-![](../images/hooker2019fig4.png)
+![](../images/hooker2019fig4.PNG)
 
 ### RF ICE+PDP
 
-![](../images/hooker2019fig6b.png)
+![](../images/hooker2019fig6b.PNG)
 
 ### NN learned:
 
-![](../images/hooker2019fig5.png)
+![](../images/hooker2019fig5.PNG)
 
 ### NN ICE+PDP
 
-![](../images/hooker2019fig6a.png)
+![](../images/hooker2019fig6a.PNG)
 
 ### Lessons
 
@@ -145,13 +145,13 @@ $$y = x_1 + 0 x_2 + \epsilon$$
 
 ---
 
-![](../images/hooker2019fig7.png)
+![](../images/hooker2019fig7.PNG)
 
 ### Exploiting out-of-distribution predictions
 
 ---
 
-![](../images/slack2020title.png)
+![](../images/slack2020title.PNG)
 
 ### Setting
 
@@ -210,28 +210,28 @@ $$e(x) = {\color{SeaGreen} f(x)}{\color{SkyBlue}\delta(x)} + {\color{Goldenrod} 
 
 ---
 
-![](../images/slack2020fig1.png)
+![](../images/slack2020fig1.PNG)
 
 ### Experiments: datasets
 
-![](../images/slack2020tab1.png)
+![](../images/slack2020tab1.PNG)
 
 ### Experiments: COMPAS
 
-![](../images/slack2020fig2a.png)
+![](../images/slack2020fig2a.PNG)
 
 ### Experiments: COMPAS
 
-![](../images/slack2020fig2b.png)
+![](../images/slack2020fig2b.PNG)
 
 ### Experiments: Communities & Crime
 
-![](../images/slack2020fig3a.png)
+![](../images/slack2020fig3a.PNG)
 
 ### Experiments: Communities & Crime
 
-![](../images/slack2020fig3b.png)
+![](../images/slack2020fig3b.PNG)
 
 ### Experiments: German Credit
 
-![](../images/slack2020fig4.png)
+![](../images/slack2020fig4.PNG)
