@@ -4,7 +4,7 @@ subtitle: Craven Group meeting
 author: Yuriy Sverchkov
 date: August 28, 2020
 revealjs-url: https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2
-theme: white
+theme: black
 slideNumber: true
 ---
 
@@ -24,8 +24,8 @@ quantify, for each feature $j$, its contribution to the prediction.
 
 Breiman (2001)
 
-* $X$ - feature matrix
-* $X^{\pi, j}$ - feature matrix with $j$-th feature (column) permuted
+* $\color{Skyblue} X$ - feature matrix
+* $\color{Lavender} X^{\pi, j}$ - feature matrix with $j$-th feature (column) permuted
 * $\boldsymbol x_i$ - $i$-th instance (row)
 
 $$VI_j^\pi =
@@ -57,14 +57,14 @@ $$ICE_{i,j}(x) = f(\boldsymbol x_i^{x,j})$$
 
 For $f(x) = \hat \beta_0 + \sum_{j=1}^p \hat \beta_j x_j$ fit by least squares
 
-1. $E_\pi VI_j^\pi = 2\hat \beta^2_j \sum_{i=1}^n (x_{ij} - \bar x_j)^2$
+1. $E_\pi VI_j^\pi = 2\hat \beta^2_j \sum_{i=1}^n (x_{ij} - \bar x_j)^2 \propto \hat \beta_j^2 \mathrm{Var}(x_{j})$
 2. $PD_j(x) = C_j + \hat \beta_j x$ where $C_j = \sum_{j' \neq j} \hat \beta_{j'} x_{ij'}$
 3. $ICE_{i,j}(x) = C_{i,j} + \hat \beta_j x$ where $C_{i,j} = \sum_{j' \neq j} \hat \beta_{j'} x_{ij'}$
 
 ### Ground truth model
 
 $$\begin{array}{r}
-    y_i = x_{i1} + x_{i2} + x_{i3} + x_{i4} + x_{i5} + 0 x_{i6} \\
+    y_i = x_{i1} + x_{i2} + x_{i3} + x_{i4} + x_{i5} + 0 x_{i6} + 0.5 x_{i7} \\
     + 0.8 x_{i8} + 1.2 x_{i9} + 1.5 x_{i10} + \epsilon_i
     \end{array}$$
 
@@ -75,7 +75,7 @@ $$10 \succ 9 \succ 1 = 2 = 3 = 4 = 5 \succ 8 \succ 7 \succ 6$$
 ### Ground truth model
 
 $$\begin{array}{r}
-    y_i = x_{i1} + x_{i2} + x_{i3} + x_{i4} + x_{i5} + 0 x_{i6} \\
+    y_i = x_{i1} + x_{i2} + x_{i3} + x_{i4} + x_{i5} + 0 x_{i6} + 0.5 x_{i7} \\
     + 0.8 x_{i8} + 1.2 x_{i9} + 1.5 x_{i10} + \epsilon_i
     \end{array}$$
 
@@ -94,9 +94,6 @@ $$\begin{array}{r}
 
 Features 1 and 2 are correctly ranked when they are uncorrelated,
 but are ranked higher by nonlinear models when correlated.
-
-Feature importances are a tool for examining $f(\boldsymbol x)$;
-here we see them depend on the feature distribution.
 
 ### Simulation results: Partial Dependence Plots
 
@@ -170,34 +167,46 @@ The adversary can succeed by constructing a classifier $e$ that predicts like $f
 
 ### LIME and SHAP
 
-Find an interpretable model $g$ to explain the prediction of a black box $f$ for an instance $x$:
+Find an interpretable model $\color{skyblue} g$ to explain the prediction of a black box $\color{SeaGreen} f$ for an instance $x$:
 
-$$\mathop{\arg \min}_{g \in \mathcal G} L(f, g, \pi_x) + \Omega(g)$$
+$$\mathop{\arg \min}_{\color{skyblue} g \in \mathcal G}
+    {\color{Goldenrod} L}(
+        {\color{SeaGreen} f},
+        {\color{skyblue} g},
+        {\color{Apricot} \pi_x}) +
+    {\color{Lavender} \Omega}({\color{skyblue} g})$$
 
-* $\mathcal G$ - class of interpretable (linear) models
-* $\Omega$ - complexity of model
-* $L$ - fidelity loss
+* $\color{skyblue} \mathcal G$ - class of interpretable (linear) models
+* $\color{Lavender} \Omega$ - complexity of model
+* $\color{Goldenrod} L$ - fidelity loss
 
 ### LIME and SHAP
 
-* $L$ - fidelity loss:
+* $\color{Goldenrod} L$ - fidelity loss:
 
-$$L(f,g,\pi_x) = \sum_{x' \in X'} \left(f(x') - g(x')\right)^2\pi_x(x')$$
+$${\color{Goldenrod} L}(
+        {\color{SeaGreen} f},
+        {\color{skyblue} g},
+        {\color{Apricot} \pi_x})
+    = \sum_{\color{Lavender} x' \in X'} \left(
+        {\color{SeaGreen} f}({\color{Lavender} x'})
+        - {\color{SkyBlue} g}({\color{Lavender} x'})
+    \right)^2 {\color{Apricot} \pi_x({\color{Lavender} x'})}$$
 
-* $\pi_x$ - proximity to $x$
-* $X'$ - synthetic points making up the neighborhood of $x$
+* ${\color{Apricot} \pi_x}$ - proximity to $x$
+* $\color{Lavender} X'$ - synthetic points making up the neighborhood of $x$
 
 ### Adversarial black box
 
-$$e(x) = f(x)\delta(x) + \psi(x)(1-\delta(x)) =
+$$e(x) = {\color{SeaGreen} f(x)}{\color{SkyBlue}\delta(x)} + {\color{Goldenrod} \psi(x)}{\color{SkyBlue}(1-\delta(x))} =
     \begin{cases}
-        f(x) & \text{if } x \in \mathcal X_\mathrm{dist} \\
-        \psi(x) & \text{otherwise}
+        \color{SeaGreen} f(x) & \color{SeaGreen} \text{if } x \in \mathcal X_\mathrm{dist} \\
+        \color{Goldenrod} \psi(x) & \color{Goldenrod} \text{otherwise}
     \end{cases}$$
 
-* $f$ - biased classifier (uses sensitive features)
-* $\psi$ - classifier uncorrelated with sensitive features
-* $\delta$ - out-of-distribution classifier
+* ${\color{SeaGreen} f}$ - biased classifier (uses sensitive features)
+* ${\color{Goldenrod} \psi}$ - classifier uncorrelated with sensitive features
+* $\color{SkyBlue} \delta$ - out-of-distribution classifier
 
 ---
 
