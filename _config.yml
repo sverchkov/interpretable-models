@@ -1,5 +1,4 @@
 collections:
   presentations:
     output: true
-  images:
-    output: true
+
