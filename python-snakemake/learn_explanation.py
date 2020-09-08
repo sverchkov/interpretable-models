@@ -10,17 +10,24 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import precision_recall_curve
 
-from generalizedtrees import Trepan
+from generalizedtrees.recipes import Trepan, BornAgain, TLL
 from generalizedtrees.features import FeatureSpec
 
 # Constants
 logger = logging.getLogger()
 
-def learn_trepan(data, model, feature_names, use_optimal_threshold):
+def learn_explanation(data, feature_names, model, explainer_str, use_optimal_threshold):
     
     # Build explainer
     logger.info('Initializing explainer class')
-    explainer = Trepan(max_tree_size=20, use_m_of_n=False)
+    if (explainer_str == 'Trepan'):
+        explainer = Trepan(max_tree_size=20, use_m_of_n=False)
+    elif (explainer_str == 'BAT'):
+        explainer = BornAgain(max_tree_size=20)
+    elif (explainer_str == 'TLL'):
+        explainer = TLL(max_tree_size=20)
+    else:
+        raise ValueError(f'Unable to recognize explainer "{explainer_str}"')
 
     logger.info('Unsing full training set')
     train_x = data['train_features']
@@ -58,12 +65,12 @@ def learn_trepan(data, model, feature_names, use_optimal_threshold):
 
     return explainer
 
-def save_trepan(trepan, path):
+def cp_save(trepan, path):
 
     with Path(path).open('wb') as f:
         cp.dump(trepan, f)
     
-    logger.info('Saved explanation')
+    logger.info(f'Saved to {path}')
 
 
 def balance_sample(features, targets):
@@ -104,7 +111,9 @@ if __name__ == '__main__':
         model = joblib.load(snakemake.input.model)
         feature_names = joblib.load(snakemake.input.feature_names)
 
-        use_optimal_threshold = getattr(snakemake.params, "optimal_threshold", False)
+        explainer_str = getattr(snakemake.params, 'explainer', 'Trepan')
+
+        use_optimal_threshold = getattr(snakemake.params, 'optimal_threshold', False)
 
         if snakemake.params.balance_training:
             logger.info('Sampling a balanced training set')
@@ -114,5 +123,5 @@ if __name__ == '__main__':
             logger.info('Sampling a balanced testing set')
             data['test_features'], data['test_targets'] = balance_sample(data['test_features'], data['test_targets'])
 
-        explanation = learn_trepan(data, model, feature_names, use_optimal_threshold)
-        save_trepan(explanation, snakemake.output[0])
+        explanation = learn_explanation(data, feature_names, model, explainer_str, use_optimal_threshold)
+        cp_save(explanation, snakemake.output[0])

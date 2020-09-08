@@ -2,6 +2,11 @@
 
 ## Rules
 
+rule all:
+    input:
+        rocs = [f"../results/rocs-{model:02d}.png" for model in range(10)],
+        importances = [f"../results/rf-importances-{model:02d}.txt" for model in range(10)]
+
 rule learn_explanation:
     input:
         model = "../datasets-and-models/models/model_{model}",
@@ -9,54 +14,55 @@ rule learn_explanation:
         feature_names = "../datasets-and-models/models/feature_names.joblib"
 
     params:
-        balance_training = True,
-        balance_testing = True
+        explainer = lambda w: w.explainer,
+        balance_training = lambda w: w.train == "btr",
+        balance_testing = lambda w: w.test == "bts",
+        optimal_threshold = lambda w: w.threshold == "optt"
 
     output:
-        "../results/trepan-{model}.cloudpickle"
+        "../results/{explainer}-{train}-{test}-{threshold}-{model}.cloudpickle"
     
     log:
-        "logs/trepan-{model}-log.txt"
+        "logs/{explainer}-{train}-{test}-{threshold}-{model}-log.txt"
 
     script:
-        "learn_trepan.py"
-
-rule learn_trepan_optt:
-    input:
-        model = "../datasets-and-models/models/model_{model}",
-        data = "../datasets-and-models/models/data_{model}.joblib",
-        feature_names = "../datasets-and-models/models/feature_names.joblib"
-
-    params:
-        balance_training = True,
-        balance_testing = True,
-        optimal_threshold = True
-
-    output:
-        "../results/trepan-ot-{model}.cloudpickle"
-    
-    log:
-        "logs/trepan-ot-{model}-log.txt"
-
-    script:
-        "learn_trepan.py"
+        "learn_explanation.py"
 
 rule plot_curve:
     input:
         model = "../datasets-and-models/models/model_{model}",
         data = "../datasets-and-models/models/data_{model}.joblib",
         explanations = [
-            "../results/trepan-{model}.cloudpickle",
-            "../results/trepan-ot-{model}.cloudpickle"
-        ],
-        rf_threshold = "../results/trepan-ot-{model}-threshold.txt"
+            "../results/Trepan-btr-bts-x-{model}.cloudpickle",
+            "../results/Trepan-btr-bts-optt-{model}.cloudpickle",
+            "../results/BAT-btr-bts-x-{model}.cloudpickle",
+            "../results/BAT-btr-bts-optt-{model}.cloudpickle",
+            "../results/TLL-btr-bts-x-{model}.cloudpickle",
+            "../results/TLL-btr-bts-optt-{model}.cloudpickle"
+        ]
+        #rf_threshold = "../results/trepan-ot-{model}-threshold.txt"
     
     params:
-        labels = ['trepan', 'trapan-ot']
+        labels = [
+            'Trepan (continuous)', 'Trapan (thresholded)',
+            'Born Again (continuous)', 'Born Again (thresholded)',
+            'Trepan (logistic leaves, continuous)', 'Trapan (logistic leaves, thresholded)'
+        ]
 
     output:
-        roc = "../results/trepan-{model}-rocs.png",
-        agreement = "../results/trepan-{model}-agreements.png"
+        roc = "../results/rocs-{model}.png",
+        agreement = "../results/agreements-{model}.png"
     
     script:
         "draw_rocs.py"
+
+rule compute_importances:
+    input:
+        model = "../datasets-and-models/models/model_{model}",
+        feature_names = "../datasets-and-models/models/feature_names.joblib"
+    
+    output:
+        importances = "../results/rf-importances-{model}.txt"
+    
+    script:
+        "forest_importances.py"
