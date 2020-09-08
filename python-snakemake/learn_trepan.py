@@ -43,7 +43,7 @@ def learn_trepan(data, model, feature_names, use_optimal_threshold):
         
         # Use threshold-based prediction as the oracle
         def oracle(x):
-            w = model.predict_proba(x) > threshold
+            w = model.predict_proba(x)[:,1] > threshold
             return np.column_stack((np.where(w, 0.0, 1.0), np.where(w, 1.0, 0.0)))
             
     else:

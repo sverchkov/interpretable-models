@@ -48,7 +48,8 @@ rule plot_curve:
         explanations = [
             "../results/trepan-{model}.cloudpickle",
             "../results/trepan-ot-{model}.cloudpickle"
-        ]
+        ],
+        rf_threshold = "../results/trepan-ot-{model}-threshold.txt"
     
     params:
         labels = ['trepan', 'trapan-ot']
