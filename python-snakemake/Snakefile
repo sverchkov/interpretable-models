@@ -1,17 +1,35 @@
 # Pipeline automation
 
+## Dataset definitions
+# Dictionary of dataset name and iterable of dataset subsets
+datasets = {
+    "breast_cancer_wi": range(10),
+    "asthma_exacerbation": range(10)
+}
+
+explanation_specs = [f"{explainer}-{train}-{test}-{optt}"
+    for explainer in ["Trepan", "BAT", "TLL"]
+    for train in ["btr"]
+    for test in ["bts"]
+    for optt in ["x", "optt"]
+]
+
 ## Rules
 
 rule all:
     input:
-        #rocs_ae = [f"../results/rocs-{model:02d}.png" for model in range(10)],
-        #importances_ae = [f"../results/rf-importances-{model:02d}.txt" for model in range(10)],
-        rocs_bc = [
-            f"../results/breast_cancer_wi/reports/rocs-{model:02d}.png"
-            for model in range(10)],
-        importances_bc = [
-            f"../results/breast_cancer_wi/reports/rf-importances-{model:02d}.txt"
-            for model in range(10)]
+        rocs = [
+            f"../results/{ds}/reports/rocs-{model:02d}.png"
+            for ds in datasets
+            for model in datasets[ds]
+            ],
+        # importances are implicitly computed for vis
+        exp_vis = [
+            f"../results/{ds}/reports/{explanation}-{model:02d}.html"
+            for ds in datasets
+            for model in datasets[ds]
+            for explanation in explanation_specs
+        ]
 
 # Build RF models for UCI breast cancer data
 rule prep_breast_cancer_wi:
@@ -75,19 +93,21 @@ rule plot_curve:
 rule compute_importances:
     input:
         model = "../datasets-and-models/{dataset}/model_{model}.joblib",
+        data = "../datasets-and-models/{dataset}/data_{model}.joblib",
         feature_names = "../datasets-and-models/{dataset}/feature_names.joblib"
     
     output:
-        importances = "../results/{dataset}/reports/rf-importances-{model}.txt"
+        importances = "../results/{dataset}/reports/rf-importances-{model}.csv"
     
     script:
         "forest_importances.py"
 
 rule draw_explanation:
     input:
-        model = "../results/{dataset}/explanation/{explanation_id}.cloudpickle"
+        model = "../results/{dataset}/explanation/{explanation}-{model}.cloudpickle",
+        importances = "../results/{dataset}/reports/rf-importances-{model}.csv"
     output:
-        figure = "../results/{dataset}/reports/{explanation_id}.html"
+        figure = "../results/{dataset}/reports/{explanation}-{model}.html"
     script:
         "vis_explanation.py"
 
