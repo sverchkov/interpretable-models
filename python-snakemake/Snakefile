@@ -1,18 +1,173 @@
 # Pipeline automation
 
+## Dataset definitions
+# Dictionary of dataset name and iterable of dataset subsets
+datasets = {
+    "breast_cancer_wi": range(10),
+    "asthma_exacerbation": range(10)
+}
+
+explanation_specs = [f"{explainer}-{train}-{test}-{optt}"
+    for explainer in ["Trepan", "BAT", "TLL"]
+    for train in ["btr"]
+    for test in ["bts"]
+    for optt in ["x", "optt"]
+]
+
 ## Rules
 
+rule all:
+    input:
+        rocs = [
+            f"../results/{ds}/reports/rocs-{model:02d}.png"
+            for ds in datasets
+            for model in datasets[ds]
+            ],
+        # importances are implicitly computed for vis
+        exp_vis = [
+            f"../results/{ds}/reports/{explanation}-{model:02d}.html"
+            for ds in datasets
+            for model in datasets[ds]
+            for explanation in explanation_specs
+        ]
+
+# Build RF models for UCI breast cancer data
+rule prep_breast_cancer_wi:
+    output:
+        datasets = [f"../datasets-and-models/breast_cancer_wi/data_{n:02d}.joblib" for n in range(10)],
+        models = [f"../datasets-and-models/breast_cancer_wi/model_{n:02d}.joblib" for n in range(10)],
+        feature_names = "../datasets-and-models/breast_cancer_wi/feature_names.joblib"
+    script:
+        "prep_breast_cancer_wi.py"
+
+# Learn explanation models for a given dataset
 rule learn_explanation:
     input:
-        model = "../datasets-and-models/models/model_{model}",
-        data = "../datasets-and-models/models/data_{model}.joblib",
-        feature_names = "../datasets-and-models/models/feature_names.joblib"
+        model = "../datasets-and-models/{dataset}/model_{model}.joblib",
+        data = "../datasets-and-models/{dataset}/data_{model}.joblib",
+        feature_names = "../datasets-and-models/{dataset}/feature_names.joblib"
+
+    params:
+        explainer = lambda w: w.explainer,
+        balance_training = lambda w: w.train == "btr",
+        balance_testing = lambda w: w.test == "bts",
+        optimal_threshold = lambda w: w.threshold == "optt"
 
     output:
-        "../results/trepan-{model}.cloudpickle"
+        "../results/{dataset}/explanation/{explainer}-{train}-{test}-{threshold}-{model}.cloudpickle"
     
     log:
-        "logs/trepan-{model}-log.txt"
+        "../results/{dataset}/logs/{explainer}-{train}-{test}-{threshold}-{model}-log.txt"
 
     script:
-        "learn_trepan.py"
+        "learn_explanation.py"
+
+rule plot_curve:
+    input:
+        model = "../datasets-and-models/{dataset}/model_{model}.joblib",
+        data = "../datasets-and-models/{dataset}/data_{model}.joblib",
+        explanations = [
+            "../results/{dataset}/explanation/Trepan-btr-bts-x-{model}.cloudpickle",
+            "../results/{dataset}/explanation/Trepan-btr-bts-optt-{model}.cloudpickle",
+            "../results/{dataset}/explanation/BAT-btr-bts-x-{model}.cloudpickle",
+            "../results/{dataset}/explanation/BAT-btr-bts-optt-{model}.cloudpickle",
+            "../results/{dataset}/explanation/TLL-btr-bts-x-{model}.cloudpickle",
+            "../results/{dataset}/explanation/TLL-btr-bts-optt-{model}.cloudpickle"
+        ]
+        #rf_threshold = "../results/trepan-ot-{model}-threshold.txt"
+    
+    params:
+        labels = [
+            'Trepan (continuous)', 'Trapan (thresholded)',
+            'Born Again (continuous)', 'Born Again (thresholded)',
+            'Trepan (logistic leaves, continuous)', 'Trapan (logistic leaves, thresholded)'
+        ]
+
+    output:
+        roc = "../results/{dataset}/reports/rocs-{model}.png",
+        agreement = "../results/{dataset}/reports/agreements-{model}.png"
+    
+    script:
+        "draw_rocs.py"
+
+rule compute_importances:
+    input:
+        model = "../datasets-and-models/{dataset}/model_{model}.joblib",
+        data = "../datasets-and-models/{dataset}/data_{model}.joblib",
+        feature_names = "../datasets-and-models/{dataset}/feature_names.joblib"
+    
+    output:
+        importances = "../results/{dataset}/reports/rf-importances-{model}.csv"
+    
+    script:
+        "forest_importances.py"
+
+rule draw_explanation:
+    input:
+        model = "../results/{dataset}/explanation/{explanation}-{model}.cloudpickle",
+        importances = "../results/{dataset}/reports/rf-importances-{model}.csv"
+    output:
+        figure = "../results/{dataset}/reports/{explanation}-{model}.html"
+    script:
+        "vis_explanation.py"
+
+# Learn explanations for asthma exacerbation models
+# rule learn_ax_explanation:
+#     input:
+#         model = "../datasets-and-models/models/model_{model}",
+#         data = "../datasets-and-models/models/data_{model}.joblib",
+#         feature_names = "../datasets-and-models/models/feature_names.joblib"
+
+#     params:
+#         explainer = lambda w: w.explainer,
+#         balance_training = lambda w: w.train == "btr",
+#         balance_testing = lambda w: w.test == "bts",
+#         optimal_threshold = lambda w: w.threshold == "optt"
+
+#     output:
+#         "../results/{explainer}-{train}-{test}-{threshold}-{model}.cloudpickle"
+    
+#     log:
+#         "logs/{explainer}-{train}-{test}-{threshold}-{model}-log.txt"
+
+#     script:
+#         "learn_explanation.py"
+
+# rule plot_ax_curve:
+#     input:
+#         model = "../datasets-and-models/models/model_{model}",
+#         data = "../datasets-and-models/models/data_{model}.joblib",
+#         explanations = [
+#             "../results/Trepan-btr-bts-x-{model}.cloudpickle",
+#             "../results/Trepan-btr-bts-optt-{model}.cloudpickle",
+#             "../results/BAT-btr-bts-x-{model}.cloudpickle",
+#             "../results/BAT-btr-bts-optt-{model}.cloudpickle",
+#             "../results/TLL-btr-bts-x-{model}.cloudpickle",
+#             "../results/TLL-btr-bts-optt-{model}.cloudpickle"
+#         ]
+#         #rf_threshold = "../results/trepan-ot-{model}-threshold.txt"
+    
+#     params:
+#         labels = [
+#             'Trepan (continuous)', 'Trapan (thresholded)',
+#             'Born Again (continuous)', 'Born Again (thresholded)',
+#             'Trepan (logistic leaves, continuous)', 'Trapan (logistic leaves, thresholded)'
+#         ]
+
+#     output:
+#         roc = "../results/rocs-{model}.png",
+#         agreement = "../results/agreements-{model}.png"
+    
+#     script:
+#         "draw_rocs.py"
+
+# rule compute_ax_importances:
+#     input:
+#         model = "../datasets-and-models/models/model_{model}",
+#         feature_names = "../datasets-and-models/models/feature_names.joblib"
+    
+#     output:
+#         importances = "../results/rf-importances-{model}.txt"
+    
+#     script:
+#         "forest_importances.py"
