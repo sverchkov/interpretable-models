@@ -79,20 +79,16 @@ revealjs-url: https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2
 
 * 569 samples
 * 32 real-valued features
-* Binary classification: 
+* Binary classification (Malignant vs Benign)
 * Black box model: Random forest
 
 ### ROC curves
 
-### Agreement plots
-
-### Asthma exacerbation dataset
-
-* Black box model: Random forest
-
-### ROC curves
+!()[../images/breast_cancer_wi_Trepan_vs_BAT_roc.png]
 
 ### Agreement plots
+
+!()[../images/breast_cancer_wi_Trepan_vs_BAT_agreement.png]
 
 ## Comparing leaf model choice
 
@@ -101,7 +97,17 @@ revealjs-url: https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2
 
 ### ROC curves
 
+![](../images/breast_cancer_wi_Trepan_vs_TLL_vs_TLL3_roc.png)
+
 ### Agreement plots
+
+![](../images/breast_cancer_wi_Trepan_vs_TLL_vs_TLL3_agreement.png)
+
+### Tree models:
+* [Trepan](../examples/Trepan-ftr-fts-optt-00.html)
+* [Born-Again Tree](../examples/BAT-ftr-fts-optt-00.html)
+* [Trepan with logistic leaves, information gain score](../examples/TLL-ftr-fts-optt-00.html)
+* [Trepan with logistic leaves, linear criterion score](../examples/TLL3-ftr-fts-optt-00.html)
 
 ## Near-future work
 
@@ -110,4 +116,4 @@ Further experiments with:
 * Additional splitting criteria
 * Different split spaces
     * splitting on groups of variables based on hierarchies
-    * composite splits (e.g. $m$-of-$n$)
+    * data-driven composite splits (e.g. $m$-of-$n$)
