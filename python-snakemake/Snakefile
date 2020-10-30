@@ -1,0 +1,18 @@
+# Pipeline automation
+
+## Rules
+
+rule learn_explanation:
+    input:
+        model = "../datasets-and-models/models/model_{model}",
+        data = "../datasets-and-models/models/data_{model}.joblib",
+        feature_names = "../datasets-and-models/models/feature_names.joblib"
+
+    output:
+        "../results/trepan-{model}.cloudpickle"
+    
+    log:
+        "logs/trepan-{model}-log.txt"
+
+    script:
+        "learn_trepan.py"

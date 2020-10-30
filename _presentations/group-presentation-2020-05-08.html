@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Yuriy Sverchkov">
+  <meta name="dcterms.date" content="2020-05-08">
+  <title>Learning trees to explain models</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/css/reset.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/css/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/css/theme/black.css" id="theme">
+  <!-- Printing and PDF exports -->
+  <script>
+    var link = document.createElement( 'link' );
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match( /print-pdf/gi ) ? 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/css/print/pdf.css' : 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/css/print/paper.css';
+    document.getElementsByTagName( 'head' )[0].appendChild( link );
+  </script>
+  <!--[if lt IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/lib/js/html5shiv.js"></script>
+  <![endif]-->
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide">
+  <h1 class="title">Learning trees to explain models</h1>
+  <p class="subtitle">Group Meeting</p>
+  <p class="author">Yuriy Sverchkov</p>
+  <p class="date">May 8, 2020</p>
+</section>
+
+<section>
+<section id="model-explanation" class="title-slide slide level2">
+<h2>Model explanation</h2>
+<ul>
+<li>Highly accurate supervised learning models are often difficult to interpret
+<ul>
+<li>Deep networks</li>
+<li>Random forests</li>
+<li>Boosted models</li>
+<li>Nonlinear SVMs</li>
+</ul></li>
+</ul>
+</section>
+<section class="slide level3">
+
+<ul>
+<li>There is a need in various settings to interpret model decisions
+<ul>
+<li>High-stakes decision making
+<ul>
+<li>Medical</li>
+<li>Financial</li>
+<li>Legal</li>
+</ul></li>
+<li>Legal protections</li>
+<li>User trust</li>
+</ul></li>
+</ul>
+</section></section>
+<section id="post-hoc-model-agnostic-model-translation" class="title-slide slide level2">
+<h2>Post-hoc model-agnostic model translation</h2>
+<ul>
+<li><strong>Post-hoc</strong>: given a learned model <span class="math inline">\(f: \mathcal X \rightarrow \mathcal Y\)</span></li>
+<li><strong>model-agnostic</strong>: without assumptions about the inner workings of the model
+<ul>
+<li>Contrast with saliency maps for CNNs</li>
+</ul></li>
+<li><strong>model translation</strong>: we learn a model <span class="math inline">\(g\)</span> that performs like <span class="math inline">\(f\)</span> and is interpretable
+<ul>
+<li>Also called mimic learning</li>
+</ul></li>
+</ul>
+</section>
+
+<section>
+<section id="decision-trees-our-interpretable-model-of-choice" class="title-slide slide level2">
+<h2>Decision trees: our interpretable model of choice</h2>
+<ul>
+<li>Pros:
+<ul>
+<li>Encode decision logic transparently</li>
+<li>Cover the entire feature space by design</li>
+</ul></li>
+<li>Cons:
+<ul>
+<li>Relatively poor classifiers/regressors</li>
+<li>Accurate trees tend to be deep</li>
+</ul></li>
+</ul>
+</section>
+<section id="anatomy-of-a-decision-tree-internal-nodes" class="slide level3">
+<h3>Anatomy of a decision tree: internal nodes</h3>
+<p>Internal nodes represent conditions on features</p>
+<ul>
+<li>Axis-aligned splits (most common):
+<ul>
+<li>Thresholds for continuous/ordinal features</li>
+<li>One-or-rest for discrete features</li>
+<li>Every-value split for discrete features</li>
+</ul></li>
+</ul>
+</section>
+<section class="slide level3">
+
+<ul>
+<li>Composite condition splits:
+<ul>
+<li><span class="math inline">\(m\)</span>-of-<span class="math inline">\(n\)</span> conditions</li>
+<li>Linear function splits</li>
+</ul></li>
+</ul>
+</section>
+<section class="slide level3">
+
+<ul>
+<li>Future ideas:
+<ul>
+<li>Interval segmentation</li>
+<li>Latent/derived features</li>
+<li>Splits for temporal data (e.g. was <span class="math inline">\(x_i &gt; \theta\)</span> at some <span class="math inline">\(t &lt; \tau\)</span>)</li>
+</ul></li>
+</ul>
+</section>
+<section id="anatomy-of-a-decision-tree-leaf-nodes" class="slide level3">
+<h3>Anatomy of a decision tree: leaf nodes</h3>
+<p>Leaf nodes represent decisions</p>
+<ul>
+<li>Fixed-value prediction</li>
+<li>Fixed distribution</li>
+<li>Simple model (‘model trees’)</li>
+</ul>
+</section>
+<section id="decision-tree-learning-from-training-data" class="slide level3">
+<h3>Decision tree learning (from training data)</h3>
+<ul>
+<li>Standard: greedily grow the tree
+<ul>
+<li>Scores: gini, entropy, variance, Bayesian</li>
+<li>Algorithm:
+<ul>
+<li><em>At each potential internal node, select a split that maximizes the score on the training data.</em></li>
+<li><em>Stop splitting according to some criteria.</em>
+<ul>
+<li>Tree depth</li>
+<li>Data scarecity</li>
+<li>Degenerate score</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</section>
+<section id="section" class="slide level3">
+<h3></h3>
+<h4 id="problems">Problems</h4>
+<ul>
+<li>Maximizing the score at a higher node means possibly suboptimal choices lower down</li>
+<li>Training data at each decision dwindles as the tree grows</li>
+</ul>
+</section></section>
+<section>
+<section id="explanation-tree-learning" class="title-slide slide level2">
+<h2>Explanation tree learning</h2>
+<ul>
+<li>Given a model <span class="math inline">\(f: \mathcal X \rightarrow \mathcal Y\)</span> learn a decision tree with high fidelity to <span class="math inline">\(f\)</span></li>
+<li>Following a similar algorithm to standard decision tree learning:
+<ul>
+<li>Given a score function</li>
+<li>Algorithm:
+<ul>
+<li><strong>At each potential internal node, select a split that maximizes the score on data <span class="math inline">\((X, f(X))\)</span></strong>
+<ul>
+<li>Given a generator for <span class="math inline">\(X\)</span>, we solve the data scarecity issue.</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</section>
+<section class="slide level3">
+
+<h4 id="other-approaches">Other approaches:</h4>
+<ul>
+<li>Frosst and Hinton 2017: Learn splits and leaves by gradient descent for a fixed tree skeleton</li>
+</ul>
+</section></section>
+<section id="decisions-in-learning-an-explaining-decision-tree" class="title-slide slide level2">
+<h2>Decisions in learning an explaining decision tree</h2>
+<ul>
+<li>Condition classes at internal nodes</li>
+<li>Classes of leaf nodes</li>
+<li>Space search strategy</li>
+<li>Local score function</li>
+<li>Unlabeled data generator</li>
+<li>Stopping criteria</li>
+</ul>
+</section>
+
+<section id="the-generalizedtrees-python-package" class="title-slide slide level2">
+<h2>The <a href="https://github.com/Craven-Biostat-Lab/generalizedtrees"><code>generalizedtrees</code></a> python package</h2>
+<ul>
+<li>Python package that implements a joint framework for all variants of tree learning and allows swapping in different components that correspond to each design decision.</li>
+<li>Compatible with Scikit-Learn</li>
+</ul>
+</section>
+
+<section>
+<section id="planned-evaluations" class="title-slide slide level2">
+<h2>Planned evaluations</h2>
+<ul>
+<li>Datasets: Asthma exacerbations, MIMIC-III, UW-Health OMOP CDM extract, others</li>
+<li>Sweeping comparison of many variants of explanation tree learning</li>
+<li>Related past work
+<ul>
+<li>Craven and Shavlik 1995</li>
+<li>Breiman and Shang 1996</li>
+<li>Bastani, Kim, and Bastani 2017</li>
+<li>Frosst and Hinton 2017</li>
+</ul></li>
+</ul>
+</section>
+<section id="trepan-craven-and-shavlik-1995" class="slide level3">
+<h3>Trepan (Craven and Shavlik 1995)</h3>
+<ul>
+<li>Data generation: Independent per-feature kernel density or empirical distribution
+<ul>
+<li>Distributions are re-estimated locally as the tree grows</li>
+<li>A statistical test is used to determine whether to re-estimate the distribution</li>
+</ul></li>
+<li>Splits: <span class="math inline">\(m\)</span>-of-<span class="math inline">\(n\)</span></li>
+<li>Stopping criteria: Statistical tests</li>
+</ul>
+</section>
+<section id="born-again-trees-breiman-and-shang-1996" class="slide level3">
+<h3>Born-again Trees (Breiman and Shang 1996)</h3>
+<ul>
+<li>Data generation: ‘Smearing’ - taking a training instance and randomly swapping a random subset of its features with other instances.</li>
+<li>Data is generated first, then filtered by the tree
+<ul>
+<li>Rejection rate informs node scores (nodes that less samples reach score lower)</li>
+<li>Accepted samples used to compute impurity at node</li>
+</ul></li>
+<li>Stopping criteria: Exhaustion of original training data at a node.</li>
+</ul>
+</section>
+<section id="bastani-kim-and-bastani-2017" class="slide level3">
+<h3>Bastani, Kim, and Bastani 2017</h3>
+<ul>
+<li>Data generation: mixture of gaussians.</li>
+<li>Efficient sampling subject to constraints.</li>
+<li>Only generated data is used.</li>
+</ul>
+</section>
+<section id="frosst-and-hinton-2017" class="slide level3">
+<h3>Frosst and Hinton 2017</h3>
+<ul>
+<li>Internal nodes are logistic regression classifiers</li>
+<li>Leaf nodes are softmax functions</li>
+<li>Learning: tree structure is fixed, parameters (LR weights and biases, as well as softmax inputs) are learned by gradient descent</li>
+</ul>
+</section></section>
+<section id="future-developments" class="title-slide slide level2">
+<h2>Future developments</h2>
+<ul>
+<li>Using model trees for explanation</li>
+<li>Splitting on higher-level concepts (feature groups, semantically meaningful latent features)</li>
+<li>Trees for temporal data (e.g. <span class="math inline">\(x_i &gt; \theta\)</span> at <span class="math inline">\(t &lt; \tau\)</span>)</li>
+<li>Alternate scores for computing splits</li>
+</ul>
+</section>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        // Push each slide change to the browser history
+        history: true,
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/plugin/zoom-js/zoom.js', async: true },
+          { src: 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/plugin/math/math.js', async: true },
+          { src: 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/plugin/notes/notes.js', async: true }
+        ]
+      });
+    </script>
+    </body>
+</html>

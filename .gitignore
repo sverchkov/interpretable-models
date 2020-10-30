@@ -24,6 +24,14 @@ latex/*.toc
 
 # Python-related
 venv
+**/__pycache__
 
 # VSCode
-settings.json
+.vscode
+
+# Generated
+results
+html
+
+# Snakemake-related
+python-snakemake/.snakemake
