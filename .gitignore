@@ -1,3 +1,10 @@
+# VS-code
+.vscode
+
+# Snakemake
+python-snakemake/.snakemake
+
+# LaTeX
 latex/*.aux
 latex/*.bcf
 latex/*.log
