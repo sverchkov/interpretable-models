@@ -1,4 +1,6 @@
 collections:
   presentations:
     output: true
+  examples:
+    output: true
 
