@@ -41,6 +41,9 @@ revealjs-url: https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2
 ## Explanation tree learning
 
 * Given a model $f: \mathcal X \rightarrow \mathcal Y$ learn a decision tree with high fidelity to $f$
+
+----
+
 * Greedy algorithm:
     * _Start w/ a queue of one node (the root)_
     * _While queue is not empty and stopping criteria are not met:_
@@ -55,7 +58,7 @@ revealjs-url: https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2
 <tr><td> Which </td>
 <td> split space <br/> split score <br/> data generator <br/> leaf model </td>
 <td> makes </td>
-<td> high fidelity <br/> iterpretable </td>
+<td> high-fidelity <br/> iterpretable </td>
 <td> trees? </tr>
 </table>
 
@@ -72,38 +75,40 @@ revealjs-url: https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2
     * Distributions are re-estimated locally as the tree grows
     * A statistical test is used to determine whether to re-estimate the distribution
 
+## Comparing data generation approaches
+
 * Born-again trees (Breiman and Shang 1996)
     * 'Smearing' - taking a training instance and randomly swapping a random subset of its features with other instances.
 
-### UCI Breast cancer wisconsin dataset
+## UCI Breast cancer wisconsin dataset
 
 * 569 samples
 * 32 real-valued features
 * Binary classification (Malignant vs Benign)
 * Black box model: Random forest
 
-### ROC curves
+## ROC curves
 
-!()[../images/breast_cancer_wi_Trepan_vs_BAT_roc.png]
+![](../images/breast_cancer_wi_Trepan_vs_BAT_roc.png)
 
-### Agreement plots
+## Agreement plots
 
-!()[../images/breast_cancer_wi_Trepan_vs_BAT_agreement.png]
+![](../images/breast_cancer_wi_Trepan_vs_BAT_agreement.png)
 
 ## Comparing leaf model choice
 
 * Constant estimators at the leaves, vs
 * Logistic regression models (regularized with high L1 penalty)
 
-### ROC curves
+## ROC curves
 
 ![](../images/breast_cancer_wi_Trepan_vs_TLL_vs_TLL3_roc.png)
 
-### Agreement plots
+## Agreement plots
 
 ![](../images/breast_cancer_wi_Trepan_vs_TLL_vs_TLL3_agreement.png)
 
-### Tree models:
+## Tree models:
 * [Trepan](../examples/Trepan-ftr-fts-optt-00.html)
 * [Born-Again Tree](../examples/BAT-ftr-fts-optt-00.html)
 * [Trepan with logistic leaves, information gain score](../examples/TLL-ftr-fts-optt-00.html)
@@ -112,6 +117,7 @@ revealjs-url: https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2
 ## Near-future work
 
 Further experiments with:
+
 * Additional data generation strategies
 * Additional splitting criteria
 * Different split spaces

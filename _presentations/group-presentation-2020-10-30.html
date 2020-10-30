@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Yuriy Sverchkov">
+  <meta name="dcterms.date" content="2020-10-30">
+  <title>Learning trees to explain models</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/css/reset.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/css/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/css/theme/black.css" id="theme">
+  <!-- Printing and PDF exports -->
+  <script>
+    var link = document.createElement( 'link' );
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match( /print-pdf/gi ) ? 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/css/print/pdf.css' : 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/css/print/paper.css';
+    document.getElementsByTagName( 'head' )[0].appendChild( link );
+  </script>
+  <!--[if lt IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/lib/js/html5shiv.js"></script>
+  <![endif]-->
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide">
+  <h1 class="title">Learning trees to explain models</h1>
+  <p class="subtitle">Group Meeting</p>
+  <p class="author">Yuriy Sverchkov</p>
+  <p class="date">October 30, 2020</p>
+</section>
+
+<section id="model-explanation" class="slide level2">
+<h2>Model explanation</h2>
+<ul>
+<li>Highly accurate supervised learning models are often difficult to interpret
+<ul>
+<li>Deep networks</li>
+<li>Random forests</li>
+<li>Boosted models</li>
+<li>Nonlinear SVMs</li>
+</ul></li>
+</ul>
+</section>
+<section class="slide level2">
+
+<ul>
+<li>There is a need in various settings to interpret model decisions
+<ul>
+<li>High-stakes decision making
+<ul>
+<li>Medical</li>
+<li>Financial</li>
+<li>Legal</li>
+</ul></li>
+<li>Legal protections</li>
+<li>User trust</li>
+</ul></li>
+</ul>
+</section>
+<section id="post-hoc-model-agnostic-model-translation" class="slide level2">
+<h2>Post-hoc model-agnostic model translation</h2>
+<ul>
+<li><strong>Post-hoc</strong>: given a learned model <span class="math inline">\(f: \mathcal X \rightarrow \mathcal Y\)</span></li>
+<li><strong>model-agnostic</strong>: without assumptions about the inner workings of the model
+<ul>
+<li>Contrast with saliency maps for CNNs</li>
+</ul></li>
+<li><strong>model translation</strong>: we learn a model <span class="math inline">\(g\)</span> that performs like <span class="math inline">\(f\)</span> and is interpretable
+<ul>
+<li>Also called mimic learning</li>
+</ul></li>
+</ul>
+</section>
+<section id="interpretable-model-decision-tree" class="slide level2">
+<h2>Interpretable model: decision tree</h2>
+<ul>
+<li><p>Internal nodes describe splits of the data space (define the <em>scope</em> of their children)</p></li>
+<li><p>Leaf nodes make predictions (often constant estimators, but can be models too)</p></li>
+</ul>
+</section>
+<section id="explanation-tree-learning" class="slide level2">
+<h2>Explanation tree learning</h2>
+<ul>
+<li>Given a model <span class="math inline">\(f: \mathcal X \rightarrow \mathcal Y\)</span> learn a decision tree with high fidelity to <span class="math inline">\(f\)</span></li>
+</ul>
+</section>
+<section class="slide level2">
+
+<ul>
+<li>Greedy algorithm:
+<ul>
+<li><em>Start w/ a queue of one node (the root)</em></li>
+<li><em>While queue is not empty and stopping criteria are not met:</em>
+<ul>
+<li><em>Pop a node from the queue</em></li>
+<li><em><strong>Generate data</strong> <span class="math inline">\((X, f(X))\)</span> in the scope of the node</em></li>
+<li><em><strong>Find a split</strong> that maximizes a <strong>split score</strong> on the data</em></li>
+<li><em>Generate chilren for the split and push into the queue</em></li>
+</ul></li>
+</ul></li>
+</ul>
+</section>
+<section id="question" class="slide level2">
+<h2>Question</h2>
+<table>
+<tr>
+<td>
+Which
+</td>
+<td>
+split space <br/> split score <br/> data generator <br/> leaf model
+</td>
+<td>
+makes
+</td>
+<td>
+high-fidelity <br/> iterpretable
+</td>
+<td>
+trees?
+</tr>
+</table>
+</section>
+<section id="the-generalizedtrees-python-package" class="slide level2">
+<h2>The <a href="https://github.com/Craven-Biostat-Lab/generalizedtrees"><code>generalizedtrees</code></a> python package</h2>
+<ul>
+<li><p>A joint framework for tree learning that allows swapping in different components that correspond to each design decision.</p></li>
+<li><p><a href="https://github.com/sverchkov/generalizedtrees/blob/0d5caf8e9a163b7d3c12db3c578d801ceae9e53c/generalizedtrees/recipes.py">“Recipes”</a> for making decision tree learners</p></li>
+</ul>
+</section>
+<section id="comparing-data-generation-approaches" class="slide level2">
+<h2>Comparing data generation approaches</h2>
+<ul>
+<li>Trepan (Craven and Shavlik 1995)
+<ul>
+<li>Independent per-feature kernel density or empirical distribution</li>
+<li>Distributions are re-estimated locally as the tree grows</li>
+<li>A statistical test is used to determine whether to re-estimate the distribution</li>
+</ul></li>
+</ul>
+</section>
+<section id="comparing-data-generation-approaches-1" class="slide level2">
+<h2>Comparing data generation approaches</h2>
+<ul>
+<li>Born-again trees (Breiman and Shang 1996)
+<ul>
+<li>‘Smearing’ - taking a training instance and randomly swapping a random subset of its features with other instances.</li>
+</ul></li>
+</ul>
+</section>
+<section id="uci-breast-cancer-wisconsin-dataset" class="slide level2">
+<h2>UCI Breast cancer wisconsin dataset</h2>
+<ul>
+<li>569 samples</li>
+<li>32 real-valued features</li>
+<li>Binary classification (Malignant vs Benign)</li>
+<li>Black box model: Random forest</li>
+</ul>
+</section>
+<section id="roc-curves" class="slide level2">
+<h2>ROC curves</h2>
+<p><img data-src="../images/breast_cancer_wi_Trepan_vs_BAT_roc.png" /></p>
+</section>
+<section id="agreement-plots" class="slide level2">
+<h2>Agreement plots</h2>
+<p><img data-src="../images/breast_cancer_wi_Trepan_vs_BAT_agreement.png" /></p>
+</section>
+<section id="comparing-leaf-model-choice" class="slide level2">
+<h2>Comparing leaf model choice</h2>
+<ul>
+<li>Constant estimators at the leaves, vs</li>
+<li>Logistic regression models (regularized with high L1 penalty)</li>
+</ul>
+</section>
+<section id="roc-curves-1" class="slide level2">
+<h2>ROC curves</h2>
+<p><img data-src="../images/breast_cancer_wi_Trepan_vs_TLL_vs_TLL3_roc.png" /></p>
+</section>
+<section id="agreement-plots-1" class="slide level2">
+<h2>Agreement plots</h2>
+<p><img data-src="../images/breast_cancer_wi_Trepan_vs_TLL_vs_TLL3_agreement.png" /></p>
+</section>
+<section id="tree-models" class="slide level2">
+<h2>Tree models:</h2>
+<ul>
+<li><a href="../examples/Trepan-ftr-fts-optt-00.html">Trepan</a></li>
+<li><a href="../examples/BAT-ftr-fts-optt-00.html">Born-Again Tree</a></li>
+<li><a href="../examples/TLL-ftr-fts-optt-00.html">Trepan with logistic leaves, information gain score</a></li>
+<li><a href="../examples/TLL3-ftr-fts-optt-00.html">Trepan with logistic leaves, linear criterion score</a></li>
+</ul>
+</section>
+<section id="near-future-work" class="slide level2">
+<h2>Near-future work</h2>
+<p>Further experiments with:</p>
+<ul>
+<li>Additional data generation strategies</li>
+<li>Additional splitting criteria</li>
+<li>Different split spaces
+<ul>
+<li>splitting on groups of variables based on hierarchies</li>
+<li>data-driven composite splits (e.g. <span class="math inline">\(m\)</span>-of-<span class="math inline">\(n\)</span>)</li>
+</ul></li>
+</ul>
+</section>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        // Push each slide change to the browser history
+        history: true,
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/plugin/zoom-js/zoom.js', async: true },
+          { src: 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/plugin/math/math.js', async: true },
+          { src: 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2/plugin/notes/notes.js', async: true }
+        ]
+      });
+    </script>
+    </body>
+</html>
